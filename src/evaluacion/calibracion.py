@@ -13,3 +13,7 @@ class CalibracionConfianza(BaseEstimator, RegressorMixin):
         if self.base_model is not None:
             return self.base_model.predict_proba(X)
         return np.full((X.shape[0],), 0.85)
+
+
+# Crear un alias para que joblib pueda deserializar el modelo antiguo
+CalibratedWrapper = CalibracionConfianza
