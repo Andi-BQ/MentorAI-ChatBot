@@ -9,7 +9,4 @@ config = rx.Config(
             "./.web/**/*.js",
         ],
     },
-    plugins=[
-        rx.plugins.RadixThemesPlugin(),
-    ],
 )
