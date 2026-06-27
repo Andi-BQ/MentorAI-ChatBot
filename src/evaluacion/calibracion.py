@@ -22,10 +22,22 @@ class CalibracionConfianza(BaseEstimator, RegressorMixin):
 # (asumiendo que tu clase real se llama CalibracionConfianza)
 
 class CalibratedWrapper:
-    def __init__(self, *args, **kwargs): pass
+    def __init__(self, *args, **kwargs):
+        self._model = None
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    def __getattr__(self, name):
+        return lambda *a, **kw: None
+
 
 class TemperatureScaler:
-    def __init__(self, *args, **kwargs): pass
+    def __init__(self, *args, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    def __getattr__(self, name):
+        return lambda *a, **kw: None
 
 # Si tu clase actual se llama CalibracionConfianza, los enlazamos así:
 # (Si no, puedes dejarlos como clases vacías arriba para que joblib no explote)

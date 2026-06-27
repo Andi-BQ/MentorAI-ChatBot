@@ -5,7 +5,7 @@ class CareerRecommendationEngine:
     def __init__(self):
         self.model = None
         self.scaler = None
-        self.label_encoder = None
+        self.encoder = None
         self.feature_names = [
             "analytical", "logical_reasoning", "problem_solving",
             "creativity", "design", "communication", "empathy",
@@ -19,7 +19,7 @@ class CareerRecommendationEngine:
             features = self.scaler.transform(features)
         probas = self.model.predict_proba(features)[0]
         top_indices = np.argsort(probas)[::-1][:top_k]
-        carreras = self.label_encoder.inverse_transform(top_indices)
+        carreras = self.encoder.inverse_transform(top_indices)
         results = []
         for i, (idx, carrera) in enumerate(zip(top_indices, carreras)):
             results.append({
