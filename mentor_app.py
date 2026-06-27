@@ -17,158 +17,197 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-    * { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif !important; }
+    * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important; }
 
-    .stApp {
-        background: #F8FAFC;
-    }
-
-    .block-container {
-        max-width: 780px !important;
-        padding: 0 !important;
-        margin: 0 auto !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    .chat-container {
-        max-width: 780px;
-        margin: 0 auto;
-        background: #FFFFFF;
-        border-radius: 16px;
-        box-shadow: 0 8px 32px rgba(30, 41, 59, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
-        overflow: hidden;
-    }
-
-    .chat-header {
-        padding: 28px 32px 20px;
-        text-align: center;
-        border-bottom: 1px solid #F1F5F9;
-    }
-    .chat-header h1 {
-        margin: 0;
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1E40AF;
-        letter-spacing: -0.02em;
-    }
-    .chat-header p {
-        margin: 6px 0 0 0;
-        font-size: 1rem;
-        color: #64748B;
-        font-weight: 400;
-    }
-
-    .chat-body {
-        padding: 12px 20px 16px;
-    }
+    .stApp { background: #FFFFFF; }
 
     header { display: none !important; }
     footer { display: none !important; }
     #MainMenu { display: none !important; }
     .stDeployButton { display: none !important; }
 
+    .block-container {
+        max-width: 768px !important;
+        padding: 0 !important;
+        margin: 0 auto !important;
+        background: transparent !important;
+    }
+
+    section[data-testid="stSidebar"] {
+        background: #F9FAFB !important;
+        border-right: 1px solid #E5E7EB !important;
+        min-width: 260px !important;
+    }
+
+    .sidebar-brand {
+        padding: 24px 20px 16px;
+    }
+    .sidebar-brand h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #111827;
+        margin: 0 0 4px 0;
+    }
+    .sidebar-brand p {
+        font-size: 0.85rem;
+        color: #6B7280;
+        margin: 0;
+    }
+
     div[data-testid="stChatMessage"] {
-        padding: 10px 14px !important;
-        margin-bottom: 8px !important;
+        padding: 0 !important;
+        margin: 0 !important;
         border: none !important;
     }
 
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) {
-        background: #1E40AF !important;
-        border-radius: 18px 18px 4px 18px !important;
-        max-width: 85%;
-        margin-left: auto;
+        background: #F3F4F6 !important;
+        border-radius: 16px !important;
+        padding: 12px 16px !important;
+        margin: 8px 0 8px auto !important;
+        max-width: 80%;
+        border: none !important;
     }
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) p,
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) span,
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) div {
-        color: #FFFFFF !important;
+        color: #111827 !important;
     }
 
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) {
-        background: #F8FAFC !important;
-        border-radius: 18px 18px 18px 4px !important;
-        max-width: 85%;
-        margin-right: auto;
-        border-left: 4px solid #1E40AF;
+        background: transparent !important;
+        border-radius: 0 !important;
+        padding: 8px 0 !important;
+        margin: 8px auto 8px 0 !important;
+        max-width: 90%;
+        border: none !important;
     }
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) p,
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) span,
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) div {
-        color: #1E293B !important;
+        color: #111827 !important;
     }
 
-    div[data-testid="chatAvatarIcon-user"],
-    div[data-testid="chatAvatarIcon-assistant"] {
-        font-size: 1.25rem !important;
-        background: none !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
+    div[data-testid="chatAvatarIcon-user"] {
+        font-size: 0.9rem !important;
         width: 28px !important;
         height: 28px !important;
         min-width: 28px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: #E5E7EB !important;
+        border-radius: 50% !important;
+    }
+
+    div[data-testid="chatAvatarIcon-assistant"] {
+        font-size: 0.75rem !important;
+        font-weight: 600 !important;
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: #111827 !important;
+        border-radius: 50% !important;
+        color: #FFFFFF !important;
     }
 
     div[data-testid="stChatInput"] {
-        max-width: 780px !important;
-        margin: 0 auto 28px !important;
-        padding: 0 20px !important;
-        width: 100% !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        max-width: 768px !important;
+        width: calc(100% - 320px) !important;
+        padding: 16px 0 24px !important;
+        background: linear-gradient(to bottom, transparent, #FFFFFF 30%) !important;
+        z-index: 100 !important;
     }
     div[data-testid="stChatInput"] textarea {
-        border-radius: 14px !important;
-        border: 1.5px solid #E2E8F0 !important;
+        border-radius: 16px !important;
+        border: 1px solid #D1D5DB !important;
         background: #FFFFFF !important;
-        padding: 12px 18px !important;
+        padding: 14px 18px !important;
         font-size: 0.95rem !important;
-        color: #1E293B !important;
-        box-shadow: 0 4px 16px rgba(30, 41, 59, 0.08) !important;
-        transition: all 0.2s ease !important;
+        color: #111827 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+        transition: box-shadow 0.2s ease, border-color 0.2s ease !important;
+        min-height: 52px !important;
     }
     div[data-testid="stChatInput"] textarea::placeholder {
-        color: #94A3B8 !important;
+        color: #9CA3AF !important;
     }
     div[data-testid="stChatInput"] textarea:focus {
-        border-color: #1E40AF !important;
-        box-shadow: 0 4px 20px rgba(30, 64, 175, 0.12) !important;
-    }
-
-    .stButton > button {
-        border-radius: 12px !important;
-        font-weight: 600 !important;
-        height: 44px !important;
-        transition: all 0.2s ease !important;
-    }
-    .stButton > button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    hr { margin: 20px 0 !important; border-color: #E2E8F0 !important; }
-
-    .stAlert {
-        border-radius: 12px !important;
+        border-color: #2563EB !important;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1), 0 1px 2px rgba(0, 0, 0, 0.05) !important;
     }
 
     .main > div {
-        padding-bottom: 100px !important;
+        padding-bottom: 110px !important;
+    }
+
+    .stButton > button {
+        border-radius: 10px !important;
+        font-weight: 500 !important;
+        font-size: 0.9rem !important;
+        height: 40px !important;
+        transition: all 0.15s ease !important;
+    }
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    .stButton > button[kind="primary"] {
+        background: #2563EB !important;
+        color: white !important;
+    }
+
+    hr { margin: 24px 0 !important; border: none !important; border-top: 1px solid #E5E7EB !important; }
+
+    .stAlert {
+        border-radius: 12px !important;
+        border: none !important;
+        padding: 12px 16px !important;
+    }
+    .stSpinner > div { border-color: #2563EB !important; }
+    .stSuccess { background: #F0FDF4 !important; color: #166534 !important; border: 1px solid #BBF7D0 !important; }
+    .stError { background: #FEF2F2 !important; color: #991B1B !important; border: 1px solid #FECACA !important; }
+
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) ul,
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) ol {
+        padding-left: 1.5rem !important;
+        margin: 0.5rem 0 !important;
+    }
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) li {
+        margin-bottom: 0.25rem !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ============================================================
-# HEADER (TARJETA FLOTANTE)
+# SIDEBAR
 # ============================================================
-st.markdown("""
-<div class="chat-container">
-<div class="chat-header">
-    <h1>MentorAI</h1>
-    <p>Tu orientador vocacional inteligente</p>
-</div>
-<div class="chat-body">
-""", unsafe_allow_html=True)
+with st.sidebar:
+    st.markdown("""
+    <div class="sidebar-brand">
+        <h2>🧠 MentorAI</h2>
+        <p>Tu orientador vocacional inteligente</p>
+    </div>
+    """, unsafe_allow_html=True)
+    st.divider()
+    st.markdown(
+        "<p style='font-size:0.85rem;color:#6B7280;padding:0 20px;line-height:1.5;'>"
+        "Responde las preguntas del asistente para obtener tu perfil vocacional personalizado.</p>",
+        unsafe_allow_html=True
+    )
+    st.divider()
+    st.markdown(
+        "<p style='font-size:0.8rem;color:#9CA3AF;padding:0 20px;'>"
+        "Basado en 13 competencias clave y análisis con IA.</p>",
+        unsafe_allow_html=True
+    )
 
 # ============================================================
 # 2. CARGA DEL MOTOR XGBOOST
@@ -460,11 +499,6 @@ if prompt := st.chat_input(
 
             except Exception as e:
                 message_placeholder.error(f"Error de API: {e}")
-
-# ============================================================
-# CERRAR DIVS DEL HTML
-# ============================================================
-st.markdown("</div></div>", unsafe_allow_html=True)
 
 # ============================================================
 # REQUIREMENTS.TXT
