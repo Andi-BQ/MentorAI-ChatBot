@@ -67,7 +67,7 @@ st.markdown("""
         display: flex; gap: 8px; align-items: center;
     }
     .appbar-actions .material-symbols-outlined {
-        font-size: 1.4rem; color: #00288E; cursor: pointer;
+        font-size: 24px; color: #00288E; cursor: pointer;
         padding: 6px; border-radius: 50%; transition: background 0.15s;
     }
     .appbar-actions .material-symbols-outlined:hover { background: #F1F5F9; }
@@ -200,21 +200,50 @@ st.markdown("""
         margin-bottom: 0.25rem !important;
     }
 
-    /* ── Mic Container ── */
-    .mic-container {
-        display: flex !important; justify-content: center !important;
-        margin: 8px auto 4px !important; max-width: 800px !important;
+    /* ── Mic Attach ── */
+    .mic-attach {
+        position: fixed !important; bottom: 38px !important;
+        left: 24px !important; z-index: 101 !important;
+        line-height: 1 !important;
     }
-    .mic-container button {
-        border-radius: 50% !important; width: 40px !important; height: 40px !important;
-        padding: 0 !important; display: flex !important; align-items: center !important;
-        justify-content: center !important; border: 1px solid #E2E8F0 !important;
+    @media (min-width: 848px) {
+        .mic-attach { left: calc(50% - 384px) !important; }
+    }
+    .mic-attach button {
+        width: 40px !important; height: 40px !important;
+        border-radius: 50% !important; border: 1px solid #E2E8F0 !important;
         background: #FFFFFF !important; cursor: pointer !important;
-        font-size: 1.2rem !important; line-height: 1 !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important; transition: all 0.15s ease !important;
+        display: flex !important; align-items: center !important;
+        justify-content: center !important; padding: 0 !important;
+        font-size: 20px !important; line-height: 1 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+        transition: all 0.15s ease !important;
     }
-    .mic-container button:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important; border-color: #1E40AF !important;
+    .mic-attach button:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+        border-color: #1E40AF !important; background: #EFF6FF !important;
+    }
+
+    /* ── Suggestion Cards ── */
+    .suggestion-hint {
+        text-align: center; color: #64748B; font-size: 0.8rem;
+        margin: 20px 0 8px; letter-spacing: 0.02em; font-weight: 500;
+    }
+    .suggestion-grid button {
+        background: #FFFFFF !important; border: 1px solid #E2E8F0 !important;
+        border-radius: 12px !important; padding: 14px 8px !important;
+        text-align: center !important; cursor: pointer !important;
+        font-size: 0.85rem !important; font-weight: 500 !important;
+        color: #1E293B !important; height: auto !important;
+        min-height: 72px !important; line-height: 1.4 !important;
+        transition: all 0.15s ease !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03) !important;
+        font-family: 'Inter', sans-serif !important; width: 100% !important;
+    }
+    .suggestion-grid button:hover {
+        background: #EFF6FF !important; border-color: #1E40AF !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
+        transform: translateY(-1px);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -373,11 +402,36 @@ for msg in st.session_state.messages:
             st.markdown(msg["content"])
 
 # ============================================================
-# 7. VOICE INPUT
+# 7. SUGGESTION CARDS (only before first user interaction)
+# ============================================================
+if "suggestion" not in st.session_state:
+    st.session_state.suggestion = None
+
+has_user_msgs = any(m["role"] == "user" for m in st.session_state.messages)
+if not has_user_msgs and not st.session_state.get("suggestion"):
+    st.markdown('<p class="suggestion-hint">¿Por dónde quieres empezar?</p>', unsafe_allow_html=True)
+    st.markdown('<div class="suggestion-grid">', unsafe_allow_html=True)
+    g1, g2, g3 = st.columns(3, gap="small")
+    with g1:
+        if st.button("🎓 Explorar carreras", key="sug_carreras", use_container_width=True):
+            st.session_state.suggestion = "Quiero explorar opciones de carrera profesional"
+            st.rerun()
+    with g2:
+        if st.button("💡 Descubrir fortalezas", key="sug_fortalezas", use_container_width=True):
+            st.session_state.suggestion = "Ayúdame a descubrir mis fortalezas y habilidades"
+            st.rerun()
+    with g3:
+        if st.button("🚀 Planificar futuro", key="sug_plan", use_container_width=True):
+            st.session_state.suggestion = "Necesito ayuda para planificar mi futuro profesional"
+            st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# ============================================================
+# 8. VOICE INPUT
 # ============================================================
 voice_prompt = None
 if not st.session_state.finished:
-    st.markdown('<div class="mic-container">', unsafe_allow_html=True)
+    st.markdown('<div class="mic-attach">', unsafe_allow_html=True)
     audio = mic_recorder("🎤", "🔴 Grabando...", format="wav", key="mentor_mic")
     st.markdown('</div>', unsafe_allow_html=True)
     if audio is not None:
@@ -392,13 +446,17 @@ if not st.session_state.finished:
             st.error(f"Error al transcribir audio: {e}")
 
 # ============================================================
-# 8. TEXT INPUT & PROCESSING
+# 9. TEXT INPUT & PROCESSING
 # ============================================================
-prompt = voice_prompt or st.chat_input(
-    "Escribe tu respuesta aquí..."
-    if not st.session_state.finished
-    else "La evaluación ha finalizado"
-)
+if st.session_state.get("suggestion"):
+    prompt = st.session_state.suggestion
+    st.session_state.suggestion = None
+else:
+    prompt = voice_prompt or st.chat_input(
+        "Escribe tu respuesta aquí..."
+        if not st.session_state.finished
+        else "La evaluación ha finalizado"
+    )
 
 if prompt and not st.session_state.finished:
     st.session_state.messages.append({"role": "user", "content": prompt})
