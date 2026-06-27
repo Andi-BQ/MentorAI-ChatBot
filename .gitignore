@@ -1,2 +1,10 @@
-
-.streamlit/secrets.toml
+.env
+.streamlit/
+__pycache__/
+*.pyc
+.web/
+*.pyo
+*.egg-info/
+dist/
+build/
+mentor_app.py

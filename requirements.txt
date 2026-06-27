@@ -1,11 +1,9 @@
-streamlit
+reflex>=0.6.0
 openai
 scikit-learn==1.8.0
 xgboost>=3.2.0
-lightgbm>=4.6.0
 numpy>=2.4.0
 pandas>=3.0.0
 joblib>=1.4.0
-scipy>=1.13.0
 plotly
-streamlit-mic-recorder>=0.0.8
+python-dotenv

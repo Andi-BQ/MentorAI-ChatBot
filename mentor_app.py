@@ -19,24 +19,11 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-    * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important; }
-
+    * { font-family: 'Inter', -apple-system, sans-serif !important; }
     .stApp { background: #F8FAFC; }
+    header, footer, .stDeployButton, section[data-testid="stSidebar"] { display: none !important; }
 
-    header, footer, #MainMenu, .stDeployButton, section[data-testid="stSidebar"] { display: none !important; }
-
-    .block-container {
-        max-width: 800px !important;
-        padding-top: 85px !important;
-        padding-left: 16px !important;
-        padding-right: 16px !important;
-        margin: 0 auto !important;
-        background: transparent !important;
-    }
-
-    .main > div::-webkit-scrollbar { width: 6px; }
-    .main > div::-webkit-scrollbar-track { background: transparent; }
-    .main > div::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+    .block-container { max-width: 800px !important; padding-top: 100px !important; margin: 0 auto !important; }
 
     .appbar-container {
         position: fixed; top: 0; left: 50%; transform: translateX(-50%);
@@ -46,41 +33,26 @@ st.markdown("""
         display: flex; align-items: center; justify-content: space-between;
         box-sizing: border-box;
     }
-    .appbar-logo {
-        font-size: 1.25rem; font-weight: 700; color: #00288E;
-        user-select: none; display: flex; align-items: center; gap: 8px;
-    }
-    .appbar-right-zone {
-        display: flex; gap: 8px; align-items: center;
-    }
+    .appbar-logo { font-size: 1.25rem; font-weight: 700; color: #00288E; display: flex; align-items: center; gap: 8px; }
+    .appbar-right-zone { display: flex; gap: 12px; align-items: center; }
 
     div[data-testid="stPopover"] > button {
-        background: transparent !important; border: none !important; padding: 6px !important;
-        color: #64748B !important; width: 36px !important; height: 36px !important;
+        background: transparent !important; border: none !important; padding: 0 !important;
+        color: #64748B !important; width: 38px !important; height: 38px !important;
         display: flex !important; align-items: center !important; justify-content: center !important;
         border-radius: 50% !important; box-shadow: none !important; transition: background 0.15s !important;
     }
-    div[data-testid="stPopover"] > button:hover {
-        background: #F1F5F9 !important; color: #00288E !important;
-    }
-    div[data-testid="stPopover"] svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; }
+    div[data-testid="stPopover"] > button:hover { background: #F1F5F9 !important; color: #00288E !important; }
 
-    div[data-testid="stChatMessage"] {
-        padding: 0 !important; margin: 0 0 20px 0 !important;
-        border: none !important; background: transparent !important;
-    }
+    div[data-testid="stChatMessage"] { background: transparent !important; margin-bottom: 20px !important; padding: 0 !important; }
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) {
-        background: #EFF6FF !important; border: 1px solid #BFDBFE !important;
-        border-radius: 20px 20px 4px 20px !important; padding: 14px 18px !important;
-        margin: 0 0 20px auto !important; max-width: 80% !important;
+        background: #EFF6FF !important; border: 1px solid #BFDBFE !important; border-radius: 20px 20px 4px 20px !important;
+        padding: 14px 18px !important; max-width: 80% !important; margin-left: auto !important;
     }
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) {
-        background: #FFFFFF !important; border: 1px solid #E2E8F0 !important;
-        border-radius: 20px 20px 20px 4px !important; padding: 18px 20px !important;
-        margin: 0 auto 20px 0 !important; max-width: 90% !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.02) !important;
+        background: #FFFFFF !important; border: 1px solid #E2E8F0 !important; border-radius: 20px 20px 20px 4px !important;
+        padding: 18px 20px !important; max-width: 90% !important; box-shadow: 0 4px 12px rgba(0,0,0,0.02) !important;
     }
-    div[data-testid="stChatMessage"] p, div[data-testid="stChatMessage"] span { color: #1E293B !important; font-size: 0.98rem; line-height: 1.5; }
     div[data-testid="chatAvatarIcon-user"], div[data-testid="chatAvatarIcon-assistant"] { display: none !important; }
 
     div[data-testid="stChatInput"] {
@@ -102,19 +74,15 @@ st.markdown("""
         width: 40px !important; height: 40px !important; display: flex !important; align-items: center !important; justify-content: center !important;
         position: absolute !important; right: 8px !important; bottom: 8px !important; border: none !important; z-index: 1002 !important;
     }
-    div[data-testid="stChatInput"] button::before { content: "↑" !important; font-size: 1.4rem !important; font-weight: 700 !important; }
+    div[data-testid="stChatInput"] button::before { content: "↑" !important; font-size: 1.4rem !important; font-weight: 700; }
     div[data-testid="stChatInput"] button svg { display: none !important; }
-    div[data-testid="stChatInput"] button:hover { background: #1D4ED8 !important; }
 
     .mic-container {
-        position: fixed;
-        bottom: 28px;
+        position: fixed; bottom: 28px;
         left: calc(50% + 400px - 102px);
         z-index: 1001;
     }
-    @media (max-width: 832px) {
-        .mic-container { left: auto; right: 58px; }
-    }
+    @media (max-width: 832px) { .mic-container { left: auto; right: 58px; } }
     .mic-container button {
         border: none !important; background: transparent !important; width: 40px !important; height: 40px !important;
         display: flex !important; align-items: center !important; justify-content: center !important;
@@ -122,15 +90,7 @@ st.markdown("""
     }
     .mic-container button:hover { color: #2563EB !important; background: #F1F5F9 !important; border-radius: 50% !important; }
 
-    .stButton > button {
-        background: #FFFFFF !important; color: #334155 !important; border: 1px solid #E2E8F0 !important;
-        border-radius: 16px !important; height: 52px !important; font-size: 0.95rem !important; font-weight: 500 !important;
-        transition: all 0.2s ease !important; width: 100% !important;
-    }
-    .stButton > button:hover { border-color: #3B82F6 !important; background: #EFF6FF !important; color: #1D4ED8 !important; transform: translateY(-1px); }
-
     .main > div { padding-bottom: 120px !important; }
-    hr { margin: 24px 0 !important; border: none !important; border-top: 1px solid #E2E8F0 !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -144,15 +104,15 @@ col_icon1, col_icon2 = st.columns([1, 1])
 with col_icon1:
     with st.popover("⚙️", help="Configuración del Sistema"):
         st.markdown("### ⚙️ Preferencias")
-        st.toggle("Modo oscuro simulado", value=False)
-        st.slider("Temperatura del Modelo", 0.0, 1.0, 0.7)
-        st.caption("Ajustes aplicados al motor Llama-3.3")
+        st.toggle("Modo Oscuro", value=False)
+        st.slider("Temperatura", 0.0, 1.0, 0.7)
+        st.caption("Configuración de Llama-3.3")
 
 with col_icon2:
     with st.popover("👤", help="Ver Perfil"):
-        st.markdown("### 👤 Sesión de Estudiante")
-        st.info("Estado: Evaluando Competencias")
-        if st.button("Limpiar Chat e Historial"):
+        st.markdown("### 👤 Perfil del Estudiante")
+        st.info("Estado: Evaluación Vocacional Activa")
+        if st.button("Limpiar historial de chat"):
             for key in list(st.session_state.keys()): del st.session_state[key]
             st.rerun()
 
