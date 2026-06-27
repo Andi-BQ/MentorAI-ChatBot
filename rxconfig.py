@@ -2,11 +2,7 @@ import reflex as rx
 
 config = rx.Config(
     app_name="mentorai",
-    tailwind={
-        "content": [
-            "./mentorai/**/*.{js,jsx,ts,tsx,py}",
-        ],
-    },
+    tailwind={},
     plugins=[
         rx.plugins.RadixThemesPlugin(),
     ],
