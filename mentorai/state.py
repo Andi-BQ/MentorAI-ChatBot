@@ -161,6 +161,8 @@ class State(rx.State):
     is_recording: bool = False
     temperature: float = 0.7
     input_text: str = ""
+    show_settings: bool = False
+    show_profile: bool = False
 
     top_career: str = ""
     recommendations: List[Dict[str, Any]] = []
@@ -180,10 +182,18 @@ class State(rx.State):
         self.loading = False
         self.is_recording = False
         self.input_text = ""
+        self.show_settings = False
+        self.show_profile = False
         self.top_career = ""
         self.recommendations = []
         self.radar_html = ""
         self.bar_html = ""
+
+    def toggle_settings(self):
+        self.show_settings = not self.show_settings
+
+    def toggle_profile(self):
+        self.show_profile = not self.show_profile
 
     def set_input(self, value: str):
         self.input_text = value
