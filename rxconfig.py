@@ -7,4 +7,7 @@ config = rx.Config(
             "./mentorai/**/*.{js,jsx,ts,tsx,py}",
         ],
     },
+    plugins=[
+        rx.plugins.RadixThemesPlugin(),
+    ],
 )
