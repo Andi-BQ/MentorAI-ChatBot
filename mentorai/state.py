@@ -159,7 +159,7 @@ class State(rx.State):
     show_suggestions: bool = True
     loading: bool = False
     is_recording: bool = False
-    temperature: float = 0.7
+    temperature: str = "0.7"
     input_text: str = ""
     show_settings: bool = False
     show_profile: bool = False
@@ -194,6 +194,9 @@ class State(rx.State):
 
     def toggle_profile(self):
         self.show_profile = not self.show_profile
+
+    def set_temperature(self, value: str):
+        self.temperature = value
 
     def set_input(self, value: str):
         self.input_text = value
@@ -243,7 +246,7 @@ class State(rx.State):
             response = client.chat.completions.create(
                 model="llama-3.3-70b-versatile",
                 messages=api_messages,
-                temperature=self.temperature,
+                temperature=float(self.temperature),
             )
             llm_reply = response.choices[0].message.content
             datos_llm = extract_json(llm_reply)

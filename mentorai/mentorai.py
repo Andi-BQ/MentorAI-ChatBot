@@ -233,18 +233,10 @@ def settings_popup():
                 rx.vstack(
                     rx.text("⚙️ Preferencias", font_weight="600", font_size="1rem", color="#1E293B"),
                     rx.text("Temperatura del modelo", font_size="0.8rem", color="#64748B", margin_top="8px"),
-                    rx.input(
-                        type="range",
-                        default_value=State.temperature,
-                        min=0,
-                        max=100,
+                    rx.select(
+                        ["0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1.0"],
+                        default_value="0.7",
                         on_change=State.set_temperature,
-                        width="100%",
-                    ),
-                    rx.hstack(
-                        rx.text("0.0", font_size="0.75rem", color="#94A3B8"),
-                        rx.text("1.0", font_size="0.75rem", color="#94A3B8"),
-                        justify="between",
                         width="100%",
                     ),
                     rx.text("Configuración de Llama-3.3", font_size="0.75rem", color="#94A3B8", margin_top="4px"),
