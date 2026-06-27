@@ -1,6 +1,19 @@
 import reflex as rx
 from .state import State
 
+
+class AppState(rx.State):
+    show_settings: bool = False
+    show_profile: bool = False
+
+    def toggle_settings(self):
+        self.show_settings = not self.show_settings
+
+    def toggle_profile(self):
+        self.show_profile = not self.show_profile
+
+
+
 MIC_JS = """
 window.__audioStream = null;
 window.__mediaRecorder = null;
@@ -191,16 +204,14 @@ def results_view() -> rx.Component:
             margin_bottom="24px",
         ),
         rx.cond(
-            State.radar_chart != None,
+            State.radar_html != "",
             rx.hstack(
-                rx.plotly(
-                    data=State.radar_chart["data"],
-                    layout=State.radar_chart["layout"],
+                rx.box(
+                    rx.html(State.radar_html),
                     width="100%",
                 ),
-                rx.plotly(
-                    data=State.bar_chart["data"],
-                    layout=State.bar_chart["layout"],
+                rx.box(
+                    rx.html(State.bar_html),
                     width="100%",
                 ),
                 spacing="16px",
@@ -305,6 +316,7 @@ def index() -> rx.Component:
     return rx.box(
         rx.script(MIC_JS),
         rx.style(STYLES),
+
         rx.box(
             rx.hstack(
                 rx.hstack(
@@ -319,89 +331,111 @@ def index() -> rx.Component:
                     align="center",
                 ),
                 rx.hstack(
-                    rx.popover.root(
-                        rx.popover.trigger(
-                            rx.button(
-                                "⚙️",
-                                bg="transparent",
-                                border="none",
-                                color="#64748B",
-                                width="38px",
-                                height="38px",
-                                border_radius="50%",
-                                font_size="1.2rem",
-                                cursor="pointer",
-                                _hover={"bg": "#F1F5F9", "color": "#00288E"},
+                    rx.box(
+                        rx.button(
+                            "⚙️",
+                            on_click=AppState.toggle_settings,
+                            bg="#EFF6FF" if AppState.show_settings else "transparent",
+                            border="none",
+                            color="#00288E" if AppState.show_settings else "#64748B",
+                            width="38px",
+                            height="38px",
+                            border_radius="50%",
+                            font_size="1.2rem",
+                            cursor="pointer",
+                            _hover={"bg": "#F1F5F9", "color": "#00288E"},
+                        ),
+                        rx.cond(
+                            AppState.show_settings,
+                            rx.box(
+                                rx.vstack(
+                                    rx.text("⚙️ Preferencias", font_weight="600", font_size="1rem", color="#1E293B"),
+                                    rx.text("Temperatura del modelo", font_size="0.8rem", color="#64748B", margin_top="8px"),
+                                    rx.slider(
+                                        default_value=State.temperature,
+                                        min=0,
+                                        max=100,
+                                        on_change=State.set_temperature,
+                                        width="100%",
+                                    ),
+                                    rx.hstack(
+                                        rx.text("0.0", font_size="0.75rem", color="#94A3B8"),
+                                        rx.text("1.0", font_size="0.75rem", color="#94A3B8"),
+                                        justify="between",
+                                        width="100%",
+                                    ),
+                                    rx.text("Configuración de Llama-3.3", font_size="0.75rem", color="#94A3B8", margin_top="4px"),
+                                    padding="16px",
+                                    min_width="220px",
+                                ),
+                                position="absolute",
+                                top="48px",
+                                right="0",
+                                bg="#FFFFFF",
+                                border="1px solid #E2E8F0",
+                                border_radius="12px",
+                                box_shadow="0 10px 30px -5px rgba(0,0,0,0.1)",
+                                z_index="1000",
                             ),
                         ),
-                        rx.popover.content(
-                            rx.vstack(
-                                rx.text("⚙️ Preferencias", font_weight="600", font_size="1rem", color="#1E293B"),
-                                rx.text("Temperatura del modelo", font_size="0.8rem", color="#64748B", margin_top="8px"),
-                                rx.slider(
-                                    default_value=State.temperature,
-                                    min=0,
-                                    max=100,
-                                    on_change=State.set_temperature,
-                                    width="100%",
-                                ),
-                                rx.hstack(
-                                    rx.text("0.0", font_size="0.75rem", color="#94A3B8"),
-                                    rx.text("1.0", font_size="0.75rem", color="#94A3B8"),
-                                    justify="between",
-                                    width="100%",
-                                ),
-                                rx.text("Configuración de Llama-3.3", font_size="0.75rem", color="#94A3B8", margin_top="4px"),
-                                padding="16px",
-                                min_width="220px",
-                            ),
-                        ),
+                        position="relative",
                     ),
-                    rx.popover.root(
-                        rx.popover.trigger(
-                            rx.button(
-                                "👤",
-                                bg="transparent",
-                                border="none",
-                                color="#64748B",
-                                width="38px",
-                                height="38px",
-                                border_radius="50%",
-                                font_size="1.2rem",
-                                cursor="pointer",
-                                _hover={"bg": "#F1F5F9", "color": "#00288E"},
+                    rx.box(
+                        rx.button(
+                            "👤",
+                            on_click=AppState.toggle_profile,
+                            bg="#EFF6FF" if AppState.show_profile else "transparent",
+                            border="none",
+                            color="#00288E" if AppState.show_profile else "#64748B",
+                            width="38px",
+                            height="38px",
+                            border_radius="50%",
+                            font_size="1.2rem",
+                            cursor="pointer",
+                            _hover={"bg": "#F1F5F9", "color": "#00288E"},
+                        ),
+                        rx.cond(
+                            AppState.show_profile,
+                            rx.box(
+                                rx.vstack(
+                                    rx.text("👤 Perfil del Estudiante", font_weight="600", font_size="1rem", color="#1E293B"),
+                                    rx.box(
+                                        rx.text("Estado:", font_size="0.85rem", color="#64748B"),
+                                        rx.text("Evaluación Vocacional Activa", font_size="0.85rem", color="#2563EB", font_weight="500"),
+                                        padding="8px 12px",
+                                        bg="#EFF6FF",
+                                        border_radius="8px",
+                                        margin_top="8px",
+                                        width="100%",
+                                    ),
+                                    rx.button(
+                                        "Limpiar historial y reiniciar",
+                                        on_click=State.reset_chat,
+                                        bg="transparent",
+                                        color="#EF4444",
+                                        border="1px solid #FCA5A5",
+                                        border_radius="8px",
+                                        padding="8px 16px",
+                                        font_size="0.85rem",
+                                        cursor="pointer",
+                                        _hover={"bg": "#FEF2F2"},
+                                        width="100%",
+                                        margin_top="12px",
+                                    ),
+                                    padding="16px",
+                                    min_width="240px",
+                                ),
+                                position="absolute",
+                                top="48px",
+                                right="0",
+                                bg="#FFFFFF",
+                                border="1px solid #E2E8F0",
+                                border_radius="12px",
+                                box_shadow="0 10px 30px -5px rgba(0,0,0,0.1)",
+                                z_index="1000",
                             ),
                         ),
-                        rx.popover.content(
-                            rx.vstack(
-                                rx.text("👤 Perfil del Estudiante", font_weight="600", font_size="1rem", color="#1E293B"),
-                                rx.box(
-                                    rx.text("Estado:", font_size="0.85rem", color="#64748B"),
-                                    rx.text("Evaluación Vocacional Activa", font_size="0.85rem", color="#2563EB", font_weight="500"),
-                                    padding="8px 12px",
-                                    bg="#EFF6FF",
-                                    border_radius="8px",
-                                    margin_top="8px",
-                                    width="100%",
-                                ),
-                                rx.button(
-                                    "Limpiar historial y reiniciar",
-                                    on_click=State.reset_chat,
-                                    bg="transparent",
-                                    color="#EF4444",
-                                    border="1px solid #FCA5A5",
-                                    border_radius="8px",
-                                    padding="8px 16px",
-                                    font_size="0.85rem",
-                                    cursor="pointer",
-                                    _hover={"bg": "#FEF2F2"},
-                                    width="100%",
-                                    margin_top="12px",
-                                ),
-                                padding="16px",
-                                min_width="240px",
-                            ),
-                        ),
+                        position="relative",
                     ),
                     spacing="8px",
                     align="center",

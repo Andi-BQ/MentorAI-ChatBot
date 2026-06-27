@@ -91,7 +91,7 @@ def extract_json(text: str) -> Optional[Dict[str, Any]]:
     return None
 
 
-def build_radar_chart(values: List[int]) -> dict:
+def build_radar_chart(values: List[int]) -> str:
     labels = [
         "Analítico", "Razonamiento Lógico", "Resolución Problemas",
         "Creatividad", "Diseño", "Comunicación", "Empatía",
@@ -121,10 +121,10 @@ def build_radar_chart(values: List[int]) -> dict:
         height=320,
         margin=dict(l=40, r=40, t=10, b=10),
     )
-    return fig.to_plotly_json()
+    return fig.to_html(include_plotlyjs="cdn", full_html=False)
 
 
-def build_bar_chart(recommendations: List[dict]) -> dict:
+def build_bar_chart(recommendations: List[dict]) -> str:
     labels = [r["carrera"].replace("_", " ").title() for r in recommendations]
     values = [r["confidence"] for r in recommendations]
     fig = go.Figure(go.Bar(
@@ -150,7 +150,7 @@ def build_bar_chart(recommendations: List[dict]) -> dict:
         plot_bgcolor="rgba(0,0,0,0)",
         showlegend=False,
     )
-    return fig.to_plotly_json()
+    return fig.to_html(include_plotlyjs="cdn", full_html=False)
 
 
 class State(rx.State):
@@ -164,8 +164,8 @@ class State(rx.State):
 
     top_career: str = ""
     recommendations: List[Dict[str, Any]] = []
-    radar_chart: Optional[dict] = None
-    bar_chart: Optional[dict] = None
+    radar_html: str = ""
+    bar_html: str = ""
 
     def init_chat(self):
         self.messages = [
@@ -182,8 +182,8 @@ class State(rx.State):
         self.input_text = ""
         self.top_career = ""
         self.recommendations = []
-        self.radar_chart = None
-        self.bar_chart = None
+        self.radar_html = ""
+        self.bar_html = ""
 
     def set_input(self, value: str):
         self.input_text = value
@@ -268,8 +268,8 @@ class State(rx.State):
                 )
 
                 values = [datos_llm.get(k, 5) for k in skill_keys]
-                self.radar_chart = build_radar_chart(values)
-                self.bar_chart = build_bar_chart(recomendaciones)
+                self.radar_html = build_radar_chart(values)
+                self.bar_html = build_bar_chart(recomendaciones)
             else:
                 self.messages.append({
                     "role": "assistant",
