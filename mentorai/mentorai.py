@@ -21,7 +21,7 @@ def assistant_bubble(content):
     return rx.box(
         rx.markdown(content),
         style={
-            "background-color": rx.color_mode.cond(
+            "background-color": rx.cond(rx.color_mode == "light", 
                 "rgba(255, 255, 255, 0.85)", "rgba(19, 28, 46, 0.6)"
             ),
             "backdrop-filter": "blur(16px)",
@@ -71,7 +71,7 @@ def suggestion_card(text, label, icon):
             align="center",
         ),
         style={
-            "background-color": rx.color_mode.cond(
+            "background-color": rx.cond(rx.color_mode == "light", 
                 "rgba(255, 255, 255, 0.9)", "rgba(15, 23, 42, 0.4)"
             ),
             "backdrop-filter": "blur(12px)",
@@ -129,7 +129,7 @@ def typing_indicator():
             class_name="px-2 py-1",
         ),
         style={
-            "background-color": rx.color_mode.cond(
+            "background-color": rx.cond(rx.color_mode == "light", 
                 "rgba(255, 255, 255, 0.9)", "rgba(19, 28, 46, 0.7)"
             ),
             "backdrop-filter": "blur(10px)",
@@ -242,7 +242,7 @@ def input_pill():
             ),
             align="end",
             style={
-                "background-color": rx.color_mode.cond(
+                "background-color": rx.cond(rx.color_mode == "light", 
                     "rgba(255, 255, 255, 0.92)", "rgba(15, 23, 42, 0.6)"
                 ),
                 "backdrop-filter": "blur(20px)",
@@ -293,7 +293,7 @@ def settings_popup():
                     class_name="p-4 gap-1",
                 ),
                 style={
-                    "background-color": rx.color_mode.cond("#ffffff", "#111827"),
+                    "background-color": rx.cond(rx.color_mode == "light", "#ffffff", "#111827"),
                 },
                 class_name="absolute top-12 right-0 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl z-50 min-w-[220px] animate-fade-in",
             ),
@@ -340,7 +340,7 @@ def profile_popup():
                     class_name="p-4 gap-1",
                 ),
                 style={
-                    "background-color": rx.color_mode.cond("#ffffff", "#111827"),
+                    "background-color": rx.cond(rx.color_mode == "light", "#ffffff", "#111827"),
                 },
                 class_name="absolute top-12 right-0 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl z-50 min-w-[240px] animate-fade-in",
             ),
@@ -382,7 +382,7 @@ def index():
                 class_name="flex items-center justify-between w-full max-w-4xl mx-auto h-full px-4 md:px-6",
             ),
             style={
-                "background-color": rx.color_mode.cond(
+                "background-color": rx.cond(rx.color_mode == "light", 
                     "rgba(255, 255, 255, 0.8)", "rgba(11, 15, 25, 0.7)"
                 ),
                 "backdrop-filter": "blur(20px)",
