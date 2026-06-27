@@ -199,12 +199,7 @@ def input_pill():
                 value=State.input_text,
                 on_change=State.set_input,
                 placeholder="Escribe tu mensaje aquí...",
-                on_key_down=rx.event_handler(
-                    lambda e: rx.cond(
-                        (e.key == "Enter") & (~e.shift_key),
-                        [State.send_from_input(), e.prevent_default()],
-                    )
-                ),
+                on_key_down=State.handle_key_down,
                 style={
                     "flex": "1",
                     "background": "transparent",
