@@ -18,233 +18,83 @@ st.set_page_config(page_title="MentorAI", page_icon="🧠", layout="centered")
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 
-    * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important; }
-
+    * { font-family: 'Inter', sans-serif !important; }
     .stApp { background: #F8FAFC; }
+    header, footer, .stDeployButton, section[data-testid="stSidebar"] { display: none !important; }
 
-    header { display: none !important; }
-    footer { display: none !important; }
-    #MainMenu { display: none !important; }
-    .stDeployButton { display: none !important; }
-    section[data-testid="stSidebar"] { display: none !important; }
-
-    .block-container {
-        max-width: 800px !important;
-        padding: 0 !important;
-        margin: 0 auto !important;
-        background: transparent !important;
-    }
+    .block-container { max-width: 800px !important; padding: 100px 0 120px 0 !important; margin: 0 auto !important; }
 
     /* ── Scrollbar ── */
     .main > div::-webkit-scrollbar { width: 6px; }
     .main > div::-webkit-scrollbar-track { background: transparent; }
     .main > div::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
 
-    /* ── Top AppBar ── */
+    /* ── Barra Superior Profesional ── */
     .appbar {
         position: fixed; top: 0; left: 50%; transform: translateX(-50%);
-        width: 100%; max-width: 800px;
+        width: 100%; max-width: 800px; height: 65px;
         background: #FFFFFF; border-bottom: 1px solid #E2E8F0;
-        z-index: 999; padding: 14px 24px;
+        z-index: 999; padding: 0 24px;
         display: flex; align-items: center; justify-content: space-between;
     }
-    .appbar-logo {
-        font-size: 1.25rem; font-weight: 700; color: #00288E;
-        cursor: pointer; user-select: none;
-    }
-    .appbar-nav {
-        display: flex; gap: 24px; align-items: center;
-    }
-    .appbar-nav span {
-        font-size: 0.9rem; color: #64748B; cursor: pointer; padding-bottom: 2px;
-        transition: color 0.15s;
-    }
-    .appbar-nav span.active { color: #00288E; font-weight: 600; border-bottom: 2px solid #00288E; }
-    .appbar-nav span:hover { color: #00288E; }
-    .appbar-actions {
-        display: flex; gap: 8px; align-items: center;
-    }
-    .appbar-actions .material-symbols-outlined {
-        font-size: 24px; color: #00288E; cursor: pointer;
-        padding: 6px; border-radius: 50%; transition: background 0.15s;
-    }
-    .appbar-actions .material-symbols-outlined:hover { background: #F1F5F9; }
+    .appbar-logo { font-size: 1.2rem; font-weight: 700; color: #1E40AF; }
+    .appbar-nav { display: flex; gap: 24px; }
+    .appbar-nav span { font-size: 0.9rem; color: #64748B; cursor: pointer; font-weight: 500; transition: color 0.2s; }
+    .appbar-nav span.active { color: #1E40AF; font-weight: 600; border-bottom: 2px solid #1E40AF; padding-bottom: 20px; }
+    .appbar-actions { display: flex; gap: 16px; align-items: center; color: #64748B; }
+    .appbar-actions svg { width: 22px; height: 22px; cursor: pointer; fill: currentColor; transition: color 0.2s; }
+    .appbar-actions svg:hover { color: #1E40AF; }
 
-    /* ── Executive Header ── */
-    .exec-header {
-        background: #FFFFFF; border-radius: 16px; border: 1px solid #E2E8F0;
-        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
-        padding: 20px 24px; margin: 96px 0 24px 0;
-        display: flex; align-items: center; justify-content: space-between;
-    }
-    .exec-header h2 {
-        font-size: 1.25rem; font-weight: 600; color: #1E40AF; margin: 0;
-    }
-    .exec-badge {
-        display: flex; align-items: center; gap: 8px;
-        background: #F1F5F9; padding: 6px 16px; border-radius: 999px;
-    }
-    .exec-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: #1E40AF; }
-    .exec-badge span { font-size: 0.75rem; font-weight: 600; color: #1E40AF; text-transform: uppercase; letter-spacing: 0.03em; }
-
-    /* ── Chat Messages ── */
-    div[data-testid="stChatMessage"] {
-        padding: 0 !important; margin: 0 0 16px 0 !important;
-        border: none !important; display: flex !important; align-items: flex-start !important;
-    }
-
-    /* User bubble */
+    /* ── Burbujas de chat profesionales ── */
+    div[data-testid="stChatMessage"] { background: transparent !important; margin-bottom: 20px !important; }
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) {
-        background: #EFF6FF !important; border: 1px solid #BFDBFE !important;
-        border-radius: 16px 16px 4px 16px !important;
-        padding: 14px 18px !important; margin: 0 0 16px auto !important;
-        max-width: 80% !important;
+        background: #EFF6FF !important; border: 1px solid #BFDBFE !important; border-radius: 20px 20px 4px 20px !important;
+        padding: 16px 20px !important; max-width: 85% !important; margin-left: auto !important;
     }
-    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) p,
-    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) span,
-    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) div {
-        color: #1A1B22 !important;
-    }
-
-    /* Assistant bubble */
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) {
-        background: #FFFFFF !important; border: 1px solid #E2E8F0 !important;
-        border-radius: 16px 16px 16px 4px !important;
-        padding: 18px 20px !important; margin: 0 auto 16px 0 !important;
-        max-width: 90% !important;
-        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05) !important;
+        background: #FFFFFF !important; border: 1px solid #E2E8F0 !important; border-radius: 20px 20px 20px 4px !important;
+        padding: 20px !important; max-width: 90% !important; box-shadow: 0 4px 12px rgba(0,0,0,0.02) !important;
     }
-    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) p,
-    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) span,
-    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) div {
-        color: #1A1B22 !important;
-    }
+    div[data-testid="chatAvatarIcon-user"], div[data-testid="chatAvatarIcon-assistant"] { display: none !important; }
 
-    /* Avatars */
-    div[data-testid="chatAvatarIcon-user"] {
-        display: none !important;
-    }
-    div[data-testid="chatAvatarIcon-assistant"] {
-        width: 40px !important; height: 40px !important; min-width: 40px !important;
-        display: flex !important; align-items: center !important; justify-content: center !important;
-        background: #1E40AF !important; border-radius: 50% !important;
-        font-size: 1.1rem !important; color: #FFFFFF !important;
-        margin-right: 12px !important;
-    }
-
-    /* ── Chat Input (Command Center) ── */
+    /* ── Rediseño Radical de la Caja Inferior estilo Gemini ── */
     div[data-testid="stChatInput"] {
-        position: fixed !important; bottom: 0 !important;
-        left: 50% !important; transform: translateX(-50%) !important;
-        max-width: 800px !important; width: calc(100% - 48px) !important;
-        padding: 20px 0 28px !important;
-        background: linear-gradient(to bottom, transparent, #F8FAFC 35%) !important;
-        z-index: 100 !important;
+        position: fixed !important; bottom: 24px !important; left: 50% !important; transform: translateX(-50%) !important;
+        max-width: 800px !important; width: calc(100% - 32px) !important; z-index: 999 !important; background: transparent !important;
     }
     div[data-testid="stChatInput"] > div {
-        background: #FFFFFF !important; border: 1px solid #E2E8F0 !important;
-        border-radius: 16px !important; padding: 4px !important;
-        box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05) !important;
+        background: #FFFFFF !important; border: 1px solid #CBD5E1 !important; border-radius: 32px !important;
+        padding: 4px 12px !important; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05) !important;
+        display: flex !important; align-items: center !important;
     }
-    div[data-testid="stChatInput"] textarea {
-        border: none !important; background: transparent !important;
-        border-radius: 12px !important;
-        padding: 14px 18px !important; font-size: 0.95rem !important;
-        color: #1A1B22 !important; min-height: 52px !important;
-        box-shadow: none !important;
-    }
-    div[data-testid="stChatInput"] textarea::placeholder { color: #94A3B8 !important; }
-    div[data-testid="stChatInput"] textarea:focus { box-shadow: none !important; }
+    div[data-testid="stChatInput"] textarea { background: transparent !important; border: none !important; box-shadow: none !important; padding: 12px 60px 12px 12px !important; }
+
     div[data-testid="stChatInput"] button {
-        background: #1E40AF !important; color: #FFFFFF !important;
-        border-radius: 12px !important; width: 44px !important; height: 44px !important;
-        display: flex !important; align-items: center !important; justify-content: center !important;
-        border: none !important; cursor: pointer !important;
-        transition: background 0.15s !important; margin-right: 4px !important;
+        background: #2563EB !important; color: white !important; border-radius: 50% !important;
+        width: 40px !important; height: 40px !important; display: flex !important; align-items: center; justify-content: center;
     }
-    div[data-testid="stChatInput"] button:hover { background: #00288E !important; }
-    div[data-testid="stChatInput"] button::before { content: "send"; font-family: 'Material Symbols Outlined'; }
+    div[data-testid="stChatInput"] button:hover { background: #1E40AF !important; }
 
-    .footer-note {
-        text-align: center; font-size: 0.7rem; color: #94A3B8;
-        margin-top: 8px; letter-spacing: 0.02em; font-weight: 500;
-    }
+    /* ── Micrófono flotando dentro de la caja ── */
+    .mic-container { position: fixed; bottom: 36px; right: calc((100vw - 800px)/2 + 75px); z-index: 1001; }
+    @media (max-width: 832px) { .mic-container { right: 85px; } }
+    .mic-container button { background: transparent !important; border: none !important; box-shadow: none !important; font-size: 1.4rem !important; color: #64748B !important; cursor: pointer !important; padding: 0 !important; line-height: 1 !important; }
+    .mic-container button:hover { color: #2563EB !important; }
 
-    .main > div { padding-bottom: 120px !important; }
-
-    /* ── Buttons ── */
+    /* ── Tarjetas de Sugerencias en Grilla ── */
     .stButton > button {
-        border-radius: 10px !important; font-weight: 500 !important;
-        font-size: 0.9rem !important; height: 40px !important;
-        transition: all 0.15s ease !important;
+        background: #FFFFFF !important; color: #334155 !important; border: 1px solid #E2E8F0 !important;
+        border-radius: 14px !important; height: 54px !important; font-size: 0.95rem !important; font-weight: 500 !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.01) !important; transition: all 0.2s !important; width: 100% !important;
     }
-    .stButton > button:hover {
-        transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-    .stButton > button[kind="primary"] { background: #1E40AF !important; color: white !important; }
+    .stButton > button:hover { border-color: #3B82F6 !important; background: #EFF6FF !important; color: #1D4ED8 !important; transform: translateY(-2px); }
 
     hr { margin: 24px 0 !important; border: none !important; border-top: 1px solid #E2E8F0 !important; }
-
     .stAlert { border-radius: 12px !important; border: none !important; padding: 12px 16px !important; }
     .stSpinner > div { border-color: #1E40AF !important; }
     .stSuccess { background: #F0FDF4 !important; color: #166534 !important; border: 1px solid #BBF7D0 !important; }
     .stError { background: #FEF2F2 !important; color: #991B1B !important; border: 1px solid #FECACA !important; }
-
-    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) ul,
-    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) ol {
-        padding-left: 1.5rem !important; margin: 0.5rem 0 !important;
-    }
-    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) li {
-        margin-bottom: 0.25rem !important;
-    }
-
-    /* ── Mic Attach ── */
-    .mic-attach {
-        position: fixed !important; bottom: 38px !important;
-        left: 24px !important; z-index: 101 !important;
-        line-height: 1 !important;
-    }
-    @media (min-width: 848px) {
-        .mic-attach { left: calc(50% - 384px) !important; }
-    }
-    .mic-attach button {
-        width: 40px !important; height: 40px !important;
-        border-radius: 50% !important; border: 1px solid #E2E8F0 !important;
-        background: #FFFFFF !important; cursor: pointer !important;
-        display: flex !important; align-items: center !important;
-        justify-content: center !important; padding: 0 !important;
-        font-size: 20px !important; line-height: 1 !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
-        transition: all 0.15s ease !important;
-    }
-    .mic-attach button:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
-        border-color: #1E40AF !important; background: #EFF6FF !important;
-    }
-
-    /* ── Suggestion Cards ── */
-    .suggestion-hint {
-        text-align: center; color: #64748B; font-size: 0.8rem;
-        margin: 20px 0 8px; letter-spacing: 0.02em; font-weight: 500;
-    }
-    .suggestion-grid button {
-        background: #FFFFFF !important; border: 1px solid #E2E8F0 !important;
-        border-radius: 12px !important; padding: 14px 8px !important;
-        text-align: center !important; cursor: pointer !important;
-        font-size: 0.85rem !important; font-weight: 500 !important;
-        color: #1E293B !important; height: auto !important;
-        min-height: 72px !important; line-height: 1.4 !important;
-        transition: all 0.15s ease !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.03) !important;
-        font-family: 'Inter', sans-serif !important; width: 100% !important;
-    }
-    .suggestion-grid button:hover {
-        background: #EFF6FF !important; border-color: #1E40AF !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
-        transform: translateY(-1px);
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -260,21 +110,8 @@ st.markdown("""
         <span>Recursos</span>
     </div>
     <div class="appbar-actions">
-        <span class="material-symbols-outlined">settings</span>
-        <span class="material-symbols-outlined">account_circle</span>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# ============================================================
-# EXECUTIVE HEADER
-# ============================================================
-st.markdown("""
-<div class="exec-header">
-    <h2>🧠 MentorAI</h2>
-    <div class="exec-badge">
-        <div class="dot"></div>
-        <span>Orientación Activa</span>
+        <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,5c1.66,0,3,1.34,3,3s-1.34,3-3,3s-3-1.34-3-3S10.34,5,12,5z M12,19.2c-2.5,0-4.71-1.28-6-3.22c0.03-1.99,4-3.08,6-3.08c2,0,5.97,1.09,6,3.08C16.71,17.92,14.5,19.2,12,19.2z"/></svg>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -409,8 +246,7 @@ if "suggestion" not in st.session_state:
 
 has_user_msgs = any(m["role"] == "user" for m in st.session_state.messages)
 if not has_user_msgs and not st.session_state.get("suggestion"):
-    st.markdown('<p class="suggestion-hint">¿Por dónde quieres empezar?</p>', unsafe_allow_html=True)
-    st.markdown('<div class="suggestion-grid">', unsafe_allow_html=True)
+    st.markdown('<p style="text-align:center;color:#64748B;font-size:0.85rem;margin:20px 0 8px;font-weight:500;">¿Por dónde quieres empezar?</p>', unsafe_allow_html=True)
     g1, g2, g3 = st.columns(3, gap="small")
     with g1:
         if st.button("🎓 Explorar carreras", key="sug_carreras", use_container_width=True):
@@ -424,14 +260,13 @@ if not has_user_msgs and not st.session_state.get("suggestion"):
         if st.button("🚀 Planificar futuro", key="sug_plan", use_container_width=True):
             st.session_state.suggestion = "Necesito ayuda para planificar mi futuro profesional"
             st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # ============================================================
 # 8. VOICE INPUT
 # ============================================================
 voice_prompt = None
 if not st.session_state.finished:
-    st.markdown('<div class="mic-attach">', unsafe_allow_html=True)
+    st.markdown('<div class="mic-container">', unsafe_allow_html=True)
     audio = mic_recorder("🎤", "🔴 Grabando...", format="wav", key="mentor_mic")
     st.markdown('</div>', unsafe_allow_html=True)
     if audio is not None:
