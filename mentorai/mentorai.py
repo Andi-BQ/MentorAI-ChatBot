@@ -2,42 +2,43 @@ import reflex as rx
 from .state import State
 
 
-def render_message(msg):
-    return rx.cond(
-        msg["role"] == "user",
-        rx.box(
-            rx.markdown(msg["content"]),
-            class_name="chat-user-msg",
-            margin_bottom="16px",
-            width="100%",
-        ),
-        rx.box(
-            rx.markdown(msg["content"]),
-            class_name="chat-assistant-msg",
-            margin_bottom="16px",
-            width="100%",
-        ),
+def user_bubble(content):
+    return rx.box(
+        rx.markdown(content),
+        class_name="bg-indigo-600 text-white rounded-2xl rounded-tr-md px-4 py-3 max-w-[80%] shadow-sm",
     )
 
 
-def suggestion_btn(text, label):
-    return rx.button(
-        label,
+def assistant_bubble(content):
+    return rx.box(
+        rx.markdown(content),
+        class_name="bg-white border border-slate-100 text-slate-800 rounded-2xl rounded-tl-md px-4 py-3 max-w-[80%] shadow-sm",
+    )
+
+
+def render_message(msg):
+    return rx.cond(
+        msg["role"] == "user",
+        rx.box(user_bubble(msg["content"]), class_name="flex justify-end mb-3 w-full"),
+        rx.box(assistant_bubble(msg["content"]), class_name="flex justify-start mb-3 w-full"),
+    )
+
+
+def suggestion_card(text, label, icon):
+    return rx.box(
+        rx.hstack(
+            rx.text(icon, class_name="text-2xl flex-shrink-0"),
+            rx.vstack(
+                rx.text(label, class_name="font-semibold text-sm text-slate-800"),
+                rx.text("Toca para empezar", class_name="text-xs text-slate-400"),
+                spacing="0",
+                align="start",
+            ),
+            spacing="3",
+            align="center",
+        ),
+        class_name="bg-white border border-slate-200 rounded-xl p-4 transition-all duration-200 cursor-pointer hover:border-indigo-500 hover:shadow-md",
         on_click=lambda: State.send_suggestion(text),
-        bg="#FFFFFF",
-        color="#475569",
-        border="1px solid #E2E8F0",
-        border_radius="12px",
-        padding="10px 16px",
-        font_size="0.85rem",
-        font_weight="500",
-        cursor="pointer",
-        _hover={
-            "bg": "#F8FAFC",
-            "border_color": "#2563EB",
-            "color": "#2563EB",
-        },
-        width="100%",
     )
 
 
@@ -45,100 +46,72 @@ def suggestions():
     return rx.vstack(
         rx.text(
             "¿Por dónde quieres empezar?",
-            color="#64748B",
-            font_weight="500",
-            font_size="0.9rem",
-            text_align="center",
-            margin_top="20px",
-            margin_bottom="8px",
+            class_name="text-slate-500 font-medium text-sm text-center",
         ),
-        rx.hstack(
-            suggestion_btn(
+        rx.box(
+            suggestion_card(
                 "Quiero empezar explorando mis opciones de carreras profesionales.",
-                "🎓 Explorar carreras",
+                "Explorar carreras",
+                "🎓",
             ),
-            suggestion_btn(
+            suggestion_card(
                 "Me gustaría analizar cuáles son mis mayores habilidades y fortalezas.",
-                "💡 Descubrir fortalezas",
+                "Descubrir fortalezas",
+                "💡",
             ),
-            suggestion_btn(
+            suggestion_card(
                 "Quiero armar una estrategia paso a paso para mi desarrollo futuro.",
-                "🚀 Planificar futuro",
+                "Planificar futuro",
+                "🚀",
             ),
-            spacing="2",
-            width="100%",
+            class_name="grid grid-cols-1 md:grid-cols-2 gap-4 w-full",
         ),
-        width="100%",
-        max_width="800px",
-        margin="0 auto",
-        padding="0 16px",
+        class_name="w-full max-w-2xl mx-auto px-4 gap-4",
     )
 
 
 def typing_indicator():
     return rx.box(
         rx.hstack(
-            rx.box(rx.text("●", font_size="0.6rem", color="#2563EB"), class_name="typing-dot"),
-            rx.box(rx.text("●", font_size="0.6rem", color="#2563EB"), class_name="typing-dot"),
-            rx.box(rx.text("●", font_size="0.6rem", color="#2563EB"), class_name="typing-dot"),
+            rx.box(class_name="w-2 h-2 bg-indigo-400 rounded-full animate-bounce"),
+            rx.box(class_name="w-2 h-2 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.1s]"),
+            rx.box(class_name="w-2 h-2 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.2s]"),
             spacing="1",
             align="center",
+            class_name="px-3 py-2",
         ),
-        class_name="chat-assistant-msg",
-        margin_bottom="16px",
-        width="auto",
-        display="inline-block",
+        class_name="bg-white border border-slate-100 shadow-sm rounded-2xl px-4 py-3 w-auto inline-block",
     )
 
 
 def results_view():
     return rx.vstack(
-        rx.markdown("---"),
-        rx.heading(
-            "🎯 Tu carrera ideal",
-            font_size="1.3rem",
-            color="#1E293B",
-            text_align="center",
-            margin_top="24px",
-        ),
-        rx.heading(
+        rx.box(class_name="w-full border-t border-slate-200 my-2"),
+        rx.text("🎯 Tu carrera ideal", class_name="text-xl font-bold text-slate-800 text-center mt-4"),
+        rx.text(
             State.top_career.replace("_", " ").title(),
-            font_size="1.8rem",
-            color="#2563EB",
-            text_align="center",
-            font_weight="700",
-            margin_bottom="24px",
+            class_name="text-3xl font-bold text-indigo-600 text-center mb-6",
         ),
         rx.cond(
             State.radar_html != "",
-            rx.hstack(
-                rx.box(rx.html(State.radar_html), width="100%"),
-                rx.box(rx.html(State.bar_html), width="100%"),
-                spacing="4",
-                width="100%",
-                max_width="800px",
-                padding="0 16px",
-                flex_wrap="wrap",
+            rx.box(
+                rx.box(rx.html(State.radar_html), class_name="w-full md:w-1/2"),
+                rx.box(rx.html(State.bar_html), class_name="w-full md:w-1/2"),
+                class_name="flex flex-col md:flex-row gap-6 w-full max-w-4xl",
             ),
         ),
-        rx.markdown("---"),
+        rx.box(class_name="w-full border-t border-slate-200 my-4"),
         rx.button(
-            "🔄 Volver a comenzar",
+            rx.hstack(
+                rx.text("🔄", class_name="text-lg"),
+                rx.text("Volver a comenzar", class_name="font-semibold"),
+                spacing="2",
+                align="center",
+            ),
             on_click=State.reset_chat,
-            bg="#2563EB",
-            color="#FFFFFF",
-            font_weight="600",
-            font_size="1rem",
-            padding="14px 32px",
-            border_radius="12px",
-            cursor="pointer",
-            _hover={"bg": "#1D4ED8"},
-            width="100%",
-            max_width="400px",
+            class_name="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 px-8 rounded-xl transition-all duration-200 shadow-sm w-full max-w-xs cursor-pointer border-none",
         ),
-        width="100%",
-        align="center",
-        padding_bottom="40px",
+        class_name="w-full flex flex-col items-center gap-4 pb-16",
     )
 
 
@@ -148,172 +121,95 @@ def input_pill():
             rx.input(
                 value=State.input_text,
                 on_change=State.set_input,
-                placeholder="Escribe tu respuesta aquí...",
-                bg="#FFFFFF",
-                border="none",
-                outline="none",
-                border_radius="32px",
-                padding="12px 16px",
-                font_size="0.95rem",
-                width="100%",
-                _focus={"outline": "none", "border": "none", "box_shadow": "none"},
+                placeholder="Escribe tu mensaje...",
+                class_name="flex-1 bg-transparent border-none outline-none px-4 py-3.5 text-sm text-slate-700 placeholder:text-slate-400",
             ),
             rx.button(
                 rx.cond(
                     State.is_recording,
-                    rx.text("🔴", class_name="recording-indicator"),
-                    rx.text("🎤"),
+                    rx.text("●", class_name="text-red-500 text-lg animate-pulse"),
+                    rx.text("🎤", class_name="text-lg"),
                 ),
                 on_click=State.toggle_recording,
-                bg="transparent",
-                color="#64748B",
-                border="none",
-                font_size="1.2rem",
-                width="40px",
-                height="40px",
-                border_radius="50%",
-                cursor="pointer",
-                _hover={"bg": "#F1F5F9", "color": "#2563EB"},
-                flex_shrink="0",
-                padding="0",
+                class_name="w-9 h-9 flex items-center justify-center rounded-full bg-transparent hover:bg-slate-100 transition-colors duration-150 flex-shrink-0 border-none cursor-pointer",
             ),
             rx.button(
-                "↑",
+                rx.text("↑", class_name="text-white font-bold"),
                 on_click=State.send_from_input,
-                bg="#2563EB",
-                color="#FFFFFF",
-                border="none",
-                border_radius="50%",
-                width="40px",
-                height="40px",
-                font_size="1.3rem",
-                font_weight="700",
-                cursor="pointer",
-                _hover={"bg": "#1D4ED8"},
-                flex_shrink="0",
-                padding="0",
-                margin_right="4px",
+                class_name="w-9 h-9 flex items-center justify-center rounded-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 transition-all duration-150 flex-shrink-0 border-none cursor-pointer shadow-sm",
             ),
-            align="center",
-            bg="#FFFFFF",
-            border="1px solid #CBD5E1",
-            border_radius="32px",
-            padding="4px 4px 4px 16px",
-            box_shadow="0 10px 30px -5px rgba(0,0,0,0.06)",
+            class_name="flex items-center gap-1.5 bg-white border border-slate-200 rounded-2xl pl-2 pr-1.5 py-1.5 shadow-[0_8px_30px_rgb(0,0,0,0.06)]",
             width="100%",
         ),
-        position="fixed",
-        bottom="20px",
-        left="50%",
-        transform="translateX(-50%)",
-        width="calc(100% - 32px)",
-        max_width="800px",
-        z_index="999",
+        class_name="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-32px)] max-w-3xl z-50",
     )
 
 
 def settings_popup():
     return rx.box(
         rx.button(
-            "⚙️",
+            rx.text("⚙️", class_name="text-lg"),
             on_click=State.toggle_settings,
-            bg=rx.cond(State.show_settings, "#EFF6FF", "transparent"),
-            border="none",
-            color=rx.cond(State.show_settings, "#00288E", "#64748B"),
-            width="38px",
-            height="38px",
-            border_radius="50%",
-            font_size="1.2rem",
-            cursor="pointer",
-            _hover={"bg": "#F1F5F9", "color": "#00288E"},
+            class_name=rx.cond(
+                State.show_settings,
+                "w-9 h-9 flex items-center justify-center rounded-full bg-indigo-50 border-none cursor-pointer transition-colors duration-150",
+                "w-9 h-9 flex items-center justify-center rounded-full bg-transparent hover:bg-slate-100 border-none cursor-pointer transition-colors duration-150",
+            ),
         ),
         rx.cond(
             State.show_settings,
             rx.box(
                 rx.vstack(
-                    rx.text("⚙️ Preferencias", font_weight="600", font_size="1rem", color="#1E293B"),
-                    rx.text("Temperatura del modelo", font_size="0.8rem", color="#64748B", margin_top="8px"),
+                    rx.text("Preferencias", class_name="font-semibold text-base text-slate-800"),
+                    rx.text("Temperatura del modelo", class_name="text-xs text-slate-500 mt-2"),
                     rx.select(
                         ["0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1.0"],
                         default_value="0.7",
                         on_change=State.set_temperature,
-                        width="100%",
+                        class_name="w-full",
                     ),
-                    rx.text("Configuración de Llama-3.3", font_size="0.75rem", color="#94A3B8", margin_top="4px"),
-                    padding="16px",
-                    min_width="220px",
+                    rx.text("Configuración de Llama-3.3", class_name="text-xs text-slate-400 mt-1"),
+                    class_name="p-4 gap-1",
                 ),
-                position="absolute",
-                top="48px",
-                right="0",
-                bg="#FFFFFF",
-                border="1px solid #E2E8F0",
-                border_radius="12px",
-                box_shadow="0 10px 30px -5px rgba(0,0,0,0.1)",
-                z_index="1000",
+                class_name="absolute top-12 right-0 bg-white border border-slate-200 rounded-xl shadow-xl z-50 min-w-[220px]",
             ),
         ),
-        position="relative",
+        class_name="relative",
     )
 
 
 def profile_popup():
     return rx.box(
         rx.button(
-            "👤",
+            rx.text("👤", class_name="text-lg"),
             on_click=State.toggle_profile,
-            bg=rx.cond(State.show_profile, "#EFF6FF", "transparent"),
-            border="none",
-            color=rx.cond(State.show_profile, "#00288E", "#64748B"),
-            width="38px",
-            height="38px",
-            border_radius="50%",
-            font_size="1.2rem",
-            cursor="pointer",
-            _hover={"bg": "#F1F5F9", "color": "#00288E"},
+            class_name=rx.cond(
+                State.show_profile,
+                "w-9 h-9 flex items-center justify-center rounded-full bg-indigo-50 border-none cursor-pointer transition-colors duration-150",
+                "w-9 h-9 flex items-center justify-center rounded-full bg-transparent hover:bg-slate-100 border-none cursor-pointer transition-colors duration-150",
+            ),
         ),
         rx.cond(
             State.show_profile,
             rx.box(
                 rx.vstack(
-                    rx.text("👤 Perfil del Estudiante", font_weight="600", font_size="1rem", color="#1E293B"),
+                    rx.text("Perfil del Estudiante", class_name="font-semibold text-base text-slate-800"),
                     rx.box(
-                        rx.text("Estado:", font_size="0.85rem", color="#64748B"),
-                        rx.text("Evaluación Vocacional Activa", font_size="0.85rem", color="#2563EB", font_weight="500"),
-                        padding="8px 12px",
-                        bg="#EFF6FF",
-                        border_radius="8px",
-                        margin_top="8px",
-                        width="100%",
+                        rx.text("Estado:", class_name="text-xs text-slate-500"),
+                        rx.text("Evaluación Vocacional Activa", class_name="text-xs text-indigo-600 font-medium"),
+                        class_name="bg-indigo-50 rounded-lg p-3 w-full mt-2",
                     ),
                     rx.button(
                         "Limpiar historial y reiniciar",
                         on_click=State.reset_chat,
-                        bg="transparent",
-                        color="#EF4444",
-                        border="1px solid #FCA5A5",
-                        border_radius="8px",
-                        padding="8px 16px",
-                        font_size="0.85rem",
-                        cursor="pointer",
-                        _hover={"bg": "#FEF2F2"},
-                        width="100%",
-                        margin_top="12px",
+                        class_name="bg-transparent text-red-500 border border-red-200 rounded-lg px-4 py-2 text-sm cursor-pointer hover:bg-red-50 transition-colors w-full mt-3",
                     ),
-                    padding="16px",
-                    min_width="240px",
+                    class_name="p-4 gap-1",
                 ),
-                position="absolute",
-                top="48px",
-                right="0",
-                bg="#FFFFFF",
-                border="1px solid #E2E8F0",
-                border_radius="12px",
-                box_shadow="0 10px 30px -5px rgba(0,0,0,0.1)",
-                z_index="1000",
+                class_name="absolute top-12 right-0 bg-white border border-slate-200 rounded-xl shadow-xl z-50 min-w-[240px]",
             ),
         ),
-        position="relative",
+        class_name="relative",
     )
 
 
@@ -322,34 +218,18 @@ def index():
         rx.box(
             rx.hstack(
                 rx.hstack(
-                    rx.text("🧠", font_size="1.5rem"),
-                    rx.text("MentorAI", font_size="1.25rem", font_weight="700", color="#00288E"),
-                    spacing="2",
-                    align="center",
+                    rx.text("🧠", class_name="text-2xl"),
+                    rx.text("MentorAI", class_name="text-xl font-bold text-indigo-950"),
+                    class_name="flex items-center gap-2",
                 ),
                 rx.hstack(
                     settings_popup(),
                     profile_popup(),
-                    spacing="2",
-                    align="center",
+                    class_name="flex items-center gap-1",
                 ),
-                justify="between",
-                align="center",
-                width="100%",
-                max_width="800px",
-                margin="0 auto",
-                height="100%",
-                padding="0 24px",
+                class_name="flex items-center justify-between w-full max-w-4xl mx-auto h-full px-6",
             ),
-            position="fixed",
-            top="0",
-            left="50%",
-            transform="translateX(-50%)",
-            width="100%",
-            height="65px",
-            bg="#FFFFFF",
-            border_bottom="1px solid #E2E8F0",
-            z_index="999",
+            class_name="fixed top-0 left-0 w-full h-16 bg-white/80 backdrop-blur-xl border-b border-slate-200/80 z-50",
         ),
         rx.box(
             rx.foreach(
@@ -369,18 +249,10 @@ def index():
                 rx.cond(State.finished, rx.fragment(), typing_indicator()),
             ),
             rx.cond(State.finished, results_view()),
-            max_width="800px",
-            margin="0 auto",
-            padding_top="85px",
-            padding_bottom="100px",
-            padding_left="16px",
-            padding_right="16px",
-            width="100%",
+            class_name="max-w-3xl mx-auto pt-24 pb-32 px-4 w-full",
         ),
         rx.cond(State.finished, rx.fragment(), input_pill()),
-        bg="#F8FAFC",
-        min_height="100vh",
-        width="100%",
+        class_name="bg-slate-50 min-h-screen w-full",
     )
 
 
