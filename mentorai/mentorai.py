@@ -202,7 +202,7 @@ def input_pill():
                 placeholder="Escribe tu mensaje aqu\u00ed...",
                 on_key_down=lambda e: rx.cond(
                     (e.key == "Enter") & (~e.shiftKey),
-                    State.send_from_input,
+                    [rx.prevent_default, State.send_from_input()],
                 ),
                 class_name="flex-1 bg-transparent border-none resize-none min-h-[44px] max-h-[140px] text-sm outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500",
                 style={"padding": "12px 14px 12px 16px"},
