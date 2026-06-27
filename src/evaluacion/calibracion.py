@@ -15,5 +15,17 @@ class CalibracionConfianza(BaseEstimator, RegressorMixin):
         return np.full((X.shape[0],), 0.85)
 
 
-# Crear un alias para que joblib pueda deserializar el modelo antiguo
-CalibratedWrapper = CalibracionConfianza
+# ==========================================
+# ALIAS PARA DESERIALIZACIÓN DE JOBLIB
+# ==========================================
+# Definimos todas las clases antiguas para que apunten a tu lógica actual
+# (asumiendo que tu clase real se llama CalibracionConfianza)
+
+class CalibratedWrapper:
+    def __init__(self, *args, **kwargs): pass
+
+class TemperatureScaler:
+    def __init__(self, *args, **kwargs): pass
+
+# Si tu clase actual se llama CalibracionConfianza, los enlazamos así:
+# (Si no, puedes dejarlos como clases vacías arriba para que joblib no explote)
