@@ -17,20 +17,50 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-    * { font-family: 'Inter', sans-serif !important; }
+    * { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif !important; }
 
     .stApp {
-        background: linear-gradient(135deg, #DBEAFE 0%, #EFF6FF 50%, #F0F4FF 100%);
+        background: #F8FAFC;
     }
 
     .block-container {
-        max-width: 720px !important;
-        background: white !important;
-        border-radius: 16px !important;
+        max-width: 780px !important;
         padding: 0 !important;
+        margin: 0 auto !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .chat-container {
+        max-width: 780px;
+        margin: 0 auto;
+        background: #FFFFFF;
+        border-radius: 16px;
         box-shadow: 0 8px 32px rgba(30, 41, 59, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
-        margin-top: 1.5rem !important;
-        margin-bottom: 1.5rem !important;
+        overflow: hidden;
+    }
+
+    .chat-header {
+        padding: 28px 32px 20px;
+        text-align: center;
+        border-bottom: 1px solid #F1F5F9;
+    }
+    .chat-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1E40AF;
+        letter-spacing: -0.02em;
+    }
+    .chat-header p {
+        margin: 6px 0 0 0;
+        font-size: 1rem;
+        color: #64748B;
+        font-weight: 400;
+    }
+
+    .chat-body {
+        padding: 12px 20px 16px;
     }
 
     header { display: none !important; }
@@ -38,91 +68,92 @@ st.markdown("""
     #MainMenu { display: none !important; }
     .stDeployButton { display: none !important; }
 
-    .chat-header {
-        background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
-        padding: 20px 24px;
-        text-align: center;
-        color: white;
-    }
-    .chat-header h1 {
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 700;
-        letter-spacing: -0.01em;
-    }
-    .chat-header p {
-        margin: 4px 0 0 0;
-        font-size: 0.85rem;
-        opacity: 0.85;
-        font-weight: 400;
-    }
-
-    .chat-body {
-        padding: 24px 20px 12px 20px;
-    }
-
     div[data-testid="stChatMessage"] {
         padding: 10px 14px !important;
-        margin-bottom: 6px !important;
+        margin-bottom: 8px !important;
         border: none !important;
-        color: #000000 !important;
     }
-    div[data-testid="stChatMessage"] p,
-    div[data-testid="stChatMessage"] span,
-    div[data-testid="stChatMessage"] div {
-        color: #000000 !important;
-    }
+
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) {
-        background: #EFF6FF !important;
-        border-radius: 16px 16px 4px 16px !important;
+        background: #1E40AF !important;
+        border-radius: 18px 18px 4px 18px !important;
+        max-width: 85%;
+        margin-left: auto;
     }
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) p,
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) span,
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) div {
+        color: #FFFFFF !important;
+    }
+
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) {
         background: #F8FAFC !important;
-        border-radius: 16px 16px 16px 4px !important;
+        border-radius: 18px 18px 18px 4px !important;
+        max-width: 85%;
+        margin-right: auto;
+        border-left: 4px solid #1E40AF;
+    }
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) p,
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) span,
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) div {
+        color: #1E293B !important;
     }
 
     div[data-testid="chatAvatarIcon-user"],
     div[data-testid="chatAvatarIcon-assistant"] {
-        font-size: 1.5rem !important;
+        font-size: 1.25rem !important;
         background: none !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        width: 32px !important;
-        height: 32px !important;
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
     }
 
-    .stChatInput textarea {
+    div[data-testid="stChatInput"] {
+        max-width: 780px !important;
+        margin: 0 auto 28px !important;
+        padding: 0 20px !important;
+        width: 100% !important;
+    }
+    div[data-testid="stChatInput"] textarea {
         border-radius: 14px !important;
         border: 1.5px solid #E2E8F0 !important;
-        background: #F8FAFC !important;
-        padding: 10px 16px !important;
-        font-size: 0.9rem !important;
-        color: #000000 !important;
+        background: #FFFFFF !important;
+        padding: 12px 18px !important;
+        font-size: 0.95rem !important;
+        color: #1E293B !important;
+        box-shadow: 0 4px 16px rgba(30, 41, 59, 0.08) !important;
+        transition: all 0.2s ease !important;
     }
-    .stChatInput textarea::placeholder {
-        color: #6B7280 !important;
+    div[data-testid="stChatInput"] textarea::placeholder {
+        color: #94A3B8 !important;
     }
-    .stChatInput textarea:focus {
-        border-color: #3B82F6 !important;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12) !important;
+    div[data-testid="stChatInput"] textarea:focus {
+        border-color: #1E40AF !important;
+        box-shadow: 0 4px 20px rgba(30, 64, 175, 0.12) !important;
     }
 
     .stButton > button {
         border-radius: 12px !important;
         font-weight: 600 !important;
-        transition: all 0.2s ease !important;
         height: 44px !important;
+        transition: all 0.2s ease !important;
     }
     .stButton > button:hover {
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-    hr { margin: 20px 0 !important; border-color: #F1F5F9 !important; }
+    hr { margin: 20px 0 !important; border-color: #E2E8F0 !important; }
 
     .stAlert {
         border-radius: 12px !important;
+    }
+
+    .main > div {
+        padding-bottom: 100px !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -131,8 +162,9 @@ st.markdown("""
 # HEADER (TARJETA FLOTANTE)
 # ============================================================
 st.markdown("""
+<div class="chat-container">
 <div class="chat-header">
-    <h1>🧠 MentorAI</h1>
+    <h1>MentorAI</h1>
     <p>Tu orientador vocacional inteligente</p>
 </div>
 <div class="chat-body">
@@ -432,7 +464,7 @@ if prompt := st.chat_input(
 # ============================================================
 # CERRAR DIVS DEL HTML
 # ============================================================
-st.markdown("</div>", unsafe_allow_html=True)
+st.markdown("</div></div>", unsafe_allow_html=True)
 
 # ============================================================
 # REQUIREMENTS.TXT
