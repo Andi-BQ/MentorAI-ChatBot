@@ -2,7 +2,7 @@ import reflex as rx
 from .state import State
 
 # ----------------------------------------------------------------------
-# 1. BURBUJAS DE CHAT FUTURISTAS (CON BLINDAJE DE ESTILOS ANTE RADIX)
+# 1. BURBUJAS DE CHAT ADAPTATIVAS (rx.cond para tema, sin dark:)
 # ----------------------------------------------------------------------
 
 
@@ -20,31 +20,25 @@ def user_bubble(content):
 def assistant_bubble(content):
     return rx.box(
         rx.markdown(content),
-        style={
-            "background-color": rx.cond(rx.color_mode == "light", 
-                "rgba(255, 255, 255, 0.85)", "rgba(19, 28, 46, 0.6)"
-            ),
-            "backdrop-filter": "blur(16px)",
-        },
-        class_name="border border-slate-200/50 dark:border-slate-800/60 text-slate-800 dark:text-slate-100 rounded-2xl rounded-tl-sm px-5 py-3.5 max-w-[85%] md:max-w-[75%] shadow-xl dark:shadow-[0_10px_30px_rgba(0,0,0,0.3)] text-sm leading-relaxed animate-fade-in",
+        style={"backdrop-filter": "blur(16px)"},
+        class_name=rx.cond(
+            rx.color_mode == "light",
+            "rounded-2xl rounded-tl-sm px-5 py-3.5 max-w-[85%] md:max-w-[75%] shadow-xl bg-white/80 text-slate-800 border border-slate-200/50 text-sm leading-relaxed animate-fade-in",
+            "rounded-2xl rounded-tl-sm px-5 py-3.5 max-w-[85%] md:max-w-[75%] shadow-[0_10px_30px_rgba(0,0,0,0.3)] bg-[#131c2e]/60 text-slate-100 border border-slate-800/60 text-sm leading-relaxed animate-fade-in",
+        ),
     )
 
 
 def render_message(msg):
     return rx.cond(
         msg["role"] == "user",
-        rx.box(
-            user_bubble(msg["content"]), class_name="flex justify-end mb-4 w-full px-2"
-        ),
-        rx.box(
-            assistant_bubble(msg["content"]),
-            class_name="flex justify-start mb-4 w-full px-2",
-        ),
+        rx.box(user_bubble(msg["content"]), class_name="flex justify-end mb-4 w-full px-2"),
+        rx.box(assistant_bubble(msg["content"]), class_name="flex justify-start mb-4 w-full px-2"),
     )
 
 
 # ----------------------------------------------------------------------
-# 2. TARJETAS DE SUGERENCIAS RESPONSIVAS (MÓVIL EN 1 COLUMNA)
+# 2. TARJETAS DE SUGERENCIAS RESPONSIVAS (grid 1/2 columnas)
 # ----------------------------------------------------------------------
 
 
@@ -53,16 +47,17 @@ def suggestion_card(text, label, icon):
         rx.hstack(
             rx.center(
                 rx.text(icon, class_name="text-2xl"),
-                class_name="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-slate-800/50 border border-indigo-100/50 dark:border-slate-700/50 flex-shrink-0 shadow-inner",
+                class_name=rx.cond(
+                    rx.color_mode == "light",
+                    "w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100/50 flex-shrink-0 shadow-inner",
+                    "w-12 h-12 rounded-xl bg-slate-800/50 border border-slate-700/50 flex-shrink-0 shadow-inner",
+                ),
             ),
             rx.vstack(
-                rx.text(
-                    label,
-                    class_name="font-bold text-sm text-slate-800 dark:text-slate-200 tracking-wide",
-                ),
+                rx.text(label, class_name="font-bold text-sm tracking-wide"),
                 rx.text(
                     "Toca para empezar",
-                    class_name="text-xs text-slate-400 dark:text-slate-500 font-medium",
+                    class_name="text-xs font-medium text-slate-400 dark:text-slate-500",
                 ),
                 spacing="0",
                 align="start",
@@ -70,13 +65,12 @@ def suggestion_card(text, label, icon):
             spacing="3",
             align="center",
         ),
-        style={
-            "background-color": rx.cond(rx.color_mode == "light", 
-                "rgba(255, 255, 255, 0.9)", "rgba(15, 23, 42, 0.4)"
-            ),
-            "backdrop-filter": "blur(12px)",
-        },
-        class_name="border border-slate-200/60 dark:border-slate-800/80 rounded-2xl p-4 transition-all duration-300 cursor-pointer hover:border-cyan-500/50 hover:shadow-[0_0_25px_rgba(6,182,212,0.15)] dark:hover:bg-slate-900/30 hover:-translate-y-0.5",
+        class_name=rx.cond(
+            rx.color_mode == "light",
+            "border border-slate-200/60 rounded-2xl p-4 transition-all duration-300 cursor-pointer hover:border-cyan-500/50 hover:shadow-[0_0_25px_rgba(6,182,212,0.15)] hover:-translate-y-0.5 bg-white/90",
+            "border border-slate-800/80 rounded-2xl p-4 transition-all duration-300 cursor-pointer hover:border-cyan-500/50 hover:shadow-[0_0_25px_rgba(6,182,212,0.15)] hover:-translate-y-0.5 bg-[#0f172a]/40",
+        ),
+        style={"backdrop-filter": "blur(12px)"},
         on_click=lambda: State.send_suggestion(text),
     )
 
@@ -84,28 +78,32 @@ def suggestion_card(text, label, icon):
 def suggestions():
     return rx.vstack(
         rx.text(
-            "⚡ ¿Por dónde quieres empezar?",
-            class_name="text-indigo-600 dark:text-cyan-400 font-bold text-xs tracking-widest uppercase mb-1 text-center w-full",
+            "\u26a1 \u00bfPor d\u00f3nde quieres empezar?",
+            class_name=rx.cond(
+                rx.color_mode == "light",
+                "text-indigo-600 font-bold text-xs tracking-widest uppercase mb-1 text-center w-full",
+                "text-cyan-400 font-bold text-xs tracking-widest uppercase mb-1 text-center w-full",
+            ),
         ),
         rx.box(
             suggestion_card(
                 "Quiero empezar explorando mis opciones de carreras profesionales.",
                 "Explorar carreras",
-                "🎓",
+                "\U0001f393",
             ),
             suggestion_card(
-                "Me gustaría analizar cuáles son mis mayores habilidades y fortalezas.",
+                "Me gustar\u00eda analizar cu\u00e1les son mis mayores habilidades y fortalezas.",
                 "Descubrir fortalezas",
-                "💡",
+                "\U0001f4a1",
             ),
             suggestion_card(
                 "Quiero armar una estrategia paso a paso para mi desarrollo futuro.",
                 "Planificar futuro",
-                "🚀",
+                "\U0001f680",
             ),
             class_name="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-2",
         ),
-        class_name="w-full max-w-2xl mx-auto px-4 gap-2 mt-4",
+        class_name="w-full max-w-3xl mx-auto px-4 gap-2 mt-4",
     )
 
 
@@ -118,23 +116,18 @@ def typing_indicator():
     return rx.box(
         rx.hstack(
             rx.box(class_name="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"),
-            rx.box(
-                class_name="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:0.15s]"
-            ),
-            rx.box(
-                class_name="w-2 h-2 bg-purple-500 rounded-full animate-bounce [animation-delay:0.3s]"
-            ),
+            rx.box(class_name="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:0.15s]"),
+            rx.box(class_name="w-2 h-2 bg-purple-500 rounded-full animate-bounce [animation-delay:0.3s]"),
             spacing="1",
             align="center",
             class_name="px-2 py-1",
         ),
-        style={
-            "background-color": rx.cond(rx.color_mode == "light", 
-                "rgba(255, 255, 255, 0.9)", "rgba(19, 28, 46, 0.7)"
-            ),
-            "backdrop-filter": "blur(10px)",
-        },
-        class_name="border border-slate-200/60 dark:border-slate-800/60 shadow-md rounded-2xl px-4 py-3 w-auto inline-block ml-2 mb-4",
+        class_name=rx.cond(
+            rx.color_mode == "light",
+            "border border-slate-200/60 shadow-md rounded-2xl px-4 py-3 w-auto inline-block ml-2 mb-4 bg-white/90",
+            "border border-slate-800/60 shadow-md rounded-2xl px-4 py-3 w-auto inline-block ml-2 mb-4 bg-[#131c2e]/70",
+        ),
+        style={"backdrop-filter": "blur(10px)"},
     )
 
 
@@ -147,7 +140,7 @@ def results_view():
     return rx.vstack(
         rx.box(class_name="w-full border-t border-slate-200/60 dark:border-slate-800/60 my-4"),
         rx.text(
-            "🎯 Tu perfil se alinea con:",
+            "\U0001f3af Tu perfil se alinea con:",
             class_name="text-xs font-bold tracking-widest uppercase text-slate-400 dark:text-slate-500 text-center mt-2",
         ),
         rx.text(
@@ -159,11 +152,19 @@ def results_view():
             rx.box(
                 rx.box(
                     rx.html(State.radar_html),
-                    class_name="w-full md:w-1/2 p-2 bg-white dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800/80 rounded-2xl shadow-sm",
+                    class_name=rx.cond(
+                        rx.color_mode == "light",
+                        "w-full md:w-1/2 p-2 bg-white border border-slate-100 rounded-2xl shadow-sm",
+                        "w-full md:w-1/2 p-2 bg-slate-900/40 border border-slate-800/80 rounded-2xl shadow-sm",
+                    ),
                 ),
                 rx.box(
                     rx.html(State.bar_html),
-                    class_name="w-full md:w-1/2 p-2 bg-white dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800/80 rounded-2xl shadow-sm",
+                    class_name=rx.cond(
+                        rx.color_mode == "light",
+                        "w-full md:w-1/2 p-2 bg-white border border-slate-100 rounded-2xl shadow-sm",
+                        "w-full md:w-1/2 p-2 bg-slate-900/40 border border-slate-800/80 rounded-2xl shadow-sm",
+                    ),
                 ),
                 class_name="flex flex-col md:flex-row gap-6 w-full max-w-4xl px-4",
             ),
@@ -171,7 +172,7 @@ def results_view():
         rx.box(class_name="w-full border-t border-slate-200/60 dark:border-slate-800/60 my-6"),
         rx.button(
             rx.hstack(
-                rx.text("🔄", class_name="text-base"),
+                rx.text("\U0001f504", class_name="text-base"),
                 rx.text("Volver a comenzar", class_name="font-bold text-sm tracking-wide"),
                 spacing="2",
                 align="center",
@@ -188,7 +189,7 @@ def results_view():
 
 
 # ----------------------------------------------------------------------
-# 5. CAJA DE ENTRADA DE TEXTO PREMIUM (TEXT_AREA + AUTO-ENVÍO ENTER)
+# 5. CAJA DE ENTRADA (TEXT_AREA + ENTER LAMBDA + CONTENEDOR FIJO)
 # ----------------------------------------------------------------------
 
 
@@ -198,36 +199,33 @@ def input_pill():
             rx.text_area(
                 value=State.input_text,
                 on_change=State.set_input,
-                placeholder="Escribe tu mensaje aquí...",
-                on_key_down=State.handle_key_down,
-                style={
-                    "flex": "1",
-                    "background": "transparent",
-                    "border": "none",
-                    "resize": "none",
-                    "min_height": "44px",
-                    "max_height": "140px",
-                    "padding": "12px 14px 12px 16px",
-                },
-                class_name="text-sm text-slate-800 dark:text-slate-100 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500",
+                placeholder="Escribe tu mensaje aqu\u00ed...",
+                on_key_down=lambda e: rx.cond(
+                    (e.key == "Enter") & (~e.shiftKey),
+                    State.send_from_input,
+                ),
+                class_name="flex-1 bg-transparent border-none resize-none min-h-[44px] max-h-[140px] text-sm outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500",
+                style={"padding": "12px 14px 12px 16px"},
             ),
             rx.hstack(
                 rx.button(
                     rx.cond(
                         State.is_recording,
-                        rx.text("●", class_name="text-red-500 text-xl animate-pulse"),
-                        rx.text("🎤", class_name="text-base text-slate-500 dark:text-slate-400"),
+                        rx.text("\u25cf", class_name="text-red-500 text-xl animate-pulse"),
+                        rx.text("\U0001f3a4", class_name="text-base"),
                     ),
                     on_click=State.toggle_recording,
                     variant="ghost",
-                    class_name="w-10 h-10 rounded-full cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center border-none",
+                    class_name=rx.cond(
+                        rx.color_mode == "light",
+                        "w-10 h-10 rounded-full cursor-pointer hover:bg-slate-100 flex items-center justify-center border-none",
+                        "w-10 h-10 rounded-full cursor-pointer hover:bg-slate-800 flex items-center justify-center border-none",
+                    ),
                 ),
                 rx.button(
-                    rx.text("↑", class_name="text-white font-black text-lg"),
+                    rx.text("\u2191", class_name="text-white font-black text-lg"),
                     on_click=State.send_from_input,
-                    style={
-                        "background": "linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)",
-                    },
+                    style={"background": "linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)"},
                     radius="full",
                     class_name="w-10 h-10 cursor-pointer shadow-md active:scale-95 transition-all duration-150 flex items-center justify-center border-none hover:brightness-110",
                 ),
@@ -236,27 +234,26 @@ def input_pill():
                 class_name="pr-2 pb-2 md:pb-0",
             ),
             align="end",
-            style={
-                "background-color": rx.cond(rx.color_mode == "light", 
-                    "rgba(255, 255, 255, 0.92)", "rgba(15, 23, 42, 0.6)"
-                ),
-                "backdrop-filter": "blur(20px)",
-            },
-            class_name="border border-slate-200 dark:border-slate-800/80 rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.04)] dark:shadow-[0_15px_50px_rgba(0,0,0,0.4)] transition-all duration-200 w-full",
+            class_name=rx.cond(
+                rx.color_mode == "light",
+                "border border-slate-200 rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.04)] transition-all duration-200 w-full bg-white/92",
+                "border border-slate-800/80 rounded-2xl shadow-[0_15px_50px_rgba(0,0,0,0.4)] transition-all duration-200 w-full bg-[#0f172a]/60",
+            ),
+            style={"backdrop-filter": "blur(20px)"},
         ),
-        class_name="fixed bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-24px)] max-w-3xl z-50",
+        class_name="fixed bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 w-full max-w-3xl px-4 z-50",
     )
 
 
 # ----------------------------------------------------------------------
-# 6. MENÚS DESPLEGABLES RADIX SEMÁNTICOS (PREFERENCIAS & PERFIL)
+# 6. MENÚS DESPLEGABLES (PREFERENCIAS & PERFIL)
 # ----------------------------------------------------------------------
 
 
 def settings_popup():
     return rx.box(
         rx.button(
-            rx.text("⚙️", class_name="text-base"),
+            rx.text("\u2699\ufe0f", class_name="text-base"),
             on_click=State.toggle_settings,
             variant=rx.cond(State.show_settings, "surface", "ghost"),
             color_scheme="indigo",
@@ -266,10 +263,7 @@ def settings_popup():
             State.show_settings,
             rx.box(
                 rx.vstack(
-                    rx.text(
-                        "Preferencias",
-                        class_name="font-bold text-sm text-slate-800 dark:text-slate-200",
-                    ),
+                    rx.text("Preferencias", class_name="font-bold text-sm"),
                     rx.text(
                         "Temperatura del modelo",
                         class_name="text-[11px] font-semibold text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-wider",
@@ -287,10 +281,11 @@ def settings_popup():
                     ),
                     class_name="p-4 gap-1",
                 ),
-                style={
-                    "background-color": rx.cond(rx.color_mode == "light", "#ffffff", "#111827"),
-                },
-                class_name="absolute top-12 right-0 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl z-50 min-w-[220px] animate-fade-in",
+                class_name=rx.cond(
+                    rx.color_mode == "light",
+                    "absolute top-12 right-0 border border-slate-200 rounded-2xl shadow-xl z-50 min-w-[220px] animate-fade-in bg-white",
+                    "absolute top-12 right-0 border border-slate-800 rounded-2xl shadow-xl z-50 min-w-[220px] animate-fade-in bg-[#111827]",
+                ),
             ),
         ),
         class_name="relative",
@@ -300,7 +295,7 @@ def settings_popup():
 def profile_popup():
     return rx.box(
         rx.button(
-            rx.text("👤", class_name="text-base"),
+            rx.text("\U0001f464", class_name="text-base"),
             on_click=State.toggle_profile,
             variant=rx.cond(State.show_profile, "surface", "ghost"),
             color_scheme="indigo",
@@ -310,20 +305,21 @@ def profile_popup():
             State.show_profile,
             rx.box(
                 rx.vstack(
-                    rx.text(
-                        "Perfil del Estudiante",
-                        class_name="font-bold text-sm text-slate-800 dark:text-slate-200",
-                    ),
+                    rx.text("Perfil del Estudiante", class_name="font-bold text-sm"),
                     rx.box(
                         rx.text(
                             "Estado actual:",
                             class_name="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider",
                         ),
                         rx.text(
-                            "Evaluación Vocacional Activa",
-                            class_name="text-xs text-indigo-600 dark:text-cyan-400 font-bold mt-0.5",
+                            "Evaluaci\u00f3n Vocacional Activa",
+                            class_name="text-xs font-bold mt-0.5",
                         ),
-                        class_name="bg-indigo-50/60 dark:bg-slate-800/40 rounded-xl p-3 w-full mt-2 border border-indigo-100/30 dark:border-slate-700/30",
+                        class_name=rx.cond(
+                            rx.color_mode == "light",
+                            "bg-indigo-50/60 rounded-xl p-3 w-full mt-2 border border-indigo-100/30 text-indigo-600",
+                            "bg-slate-800/40 rounded-xl p-3 w-full mt-2 border border-slate-700/30 text-cyan-400",
+                        ),
                     ),
                     rx.button(
                         "Limpiar historial y reiniciar",
@@ -334,10 +330,11 @@ def profile_popup():
                     ),
                     class_name="p-4 gap-1",
                 ),
-                style={
-                    "background-color": rx.cond(rx.color_mode == "light", "#ffffff", "#111827"),
-                },
-                class_name="absolute top-12 right-0 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl z-50 min-w-[240px] animate-fade-in",
+                class_name=rx.cond(
+                    rx.color_mode == "light",
+                    "absolute top-12 right-0 border border-slate-200 rounded-2xl shadow-xl z-50 min-w-[240px] animate-fade-in bg-white",
+                    "absolute top-12 right-0 border border-slate-800 rounded-2xl shadow-xl z-50 min-w-[240px] animate-fade-in bg-[#111827]",
+                ),
             ),
         ),
         class_name="relative",
@@ -345,7 +342,7 @@ def profile_popup():
 
 
 # ----------------------------------------------------------------------
-# 7. MAQUETACIÓN ESTRUCTURAL PRINCIPAL (INDEX)
+# 7. MAQUETACIÓN PRINCIPAL (INDEX)
 # ----------------------------------------------------------------------
 
 
@@ -355,19 +352,24 @@ def index():
             rx.hstack(
                 rx.hstack(
                     rx.center(
-                        rx.text("🧠", class_name="text-xl"),
-                        class_name="w-9 h-9 bg-indigo-600/10 dark:bg-cyan-400/10 rounded-xl",
+                        rx.text("\U0001f9e0", class_name="text-xl"),
+                        class_name=rx.cond(
+                            rx.color_mode == "light",
+                            "w-9 h-9 bg-indigo-600/10 rounded-xl",
+                            "w-9 h-9 bg-cyan-400/10 rounded-xl",
+                        ),
                     ),
-                    rx.text(
-                        "MentorAI",
-                        class_name="text-lg font-black tracking-tight text-slate-900 dark:text-slate-50",
-                    ),
+                    rx.text("MentorAI", class_name="text-lg font-black tracking-tight"),
                     class_name="flex items-center gap-2.5",
                 ),
                 rx.hstack(
                     rx.color_mode.button(
                         variant="ghost",
-                        class_name="cursor-pointer rounded-full text-indigo-600 dark:text-cyan-400 hover:bg-slate-100 dark:hover:bg-slate-800 w-10 h-10 flex items-center justify-center border-none",
+                        class_name=rx.cond(
+                            rx.color_mode == "light",
+                            "cursor-pointer rounded-full text-indigo-600 hover:bg-slate-100 w-10 h-10 flex items-center justify-center border-none",
+                            "cursor-pointer rounded-full text-cyan-400 hover:bg-slate-800 w-10 h-10 flex items-center justify-center border-none",
+                        ),
                     ),
                     settings_popup(),
                     profile_popup(),
@@ -376,13 +378,15 @@ def index():
                 ),
                 class_name="flex items-center justify-between w-full max-w-4xl mx-auto h-full px-4 md:px-6",
             ),
+            class_name=rx.cond(
+                rx.color_mode == "light",
+                "fixed top-0 left-0 w-full h-16 border-b border-slate-200/60 z-50 transition-colors duration-300",
+                "fixed top-0 left-0 w-full h-16 border-b border-slate-800/60 z-50 transition-colors duration-300",
+            ),
             style={
-                "background-color": rx.cond(rx.color_mode == "light", 
-                    "rgba(255, 255, 255, 0.8)", "rgba(11, 15, 25, 0.7)"
-                ),
+                "background-color": rx.cond(rx.color_mode == "light", "rgba(255,255,255,0.8)", "rgba(11,15,25,0.7)"),
                 "backdrop-filter": "blur(20px)",
             },
-            class_name="fixed top-0 left-0 w-full h-16 border-b border-slate-200/60 dark:border-slate-800/60 z-50 transition-colors duration-300",
         ),
         rx.box(
             rx.foreach(
@@ -405,7 +409,11 @@ def index():
             class_name="max-w-3xl mx-auto pt-24 pb-36 px-3 w-full",
         ),
         rx.cond(State.finished, rx.fragment(), input_pill()),
-        class_name="bg-slate-50 dark:bg-[#0b0f19] min-h-screen w-full transition-colors duration-300 font-sans select-none",
+        class_name=rx.cond(
+            rx.color_mode == "light",
+            "bg-slate-50 text-slate-900 min-h-screen w-full transition-colors duration-300 font-sans select-none",
+            "bg-[#0b0f19] text-white min-h-screen w-full transition-colors duration-300 font-sans select-none",
+        ),
     )
 
 
@@ -422,4 +430,4 @@ app = rx.App(
         rx.el.script(src="/mic.js"),
     ],
 )
-app.add_page(index, route="/", title="MentorAI 🧠 | Orientación Profesional Vocacional")
+app.add_page(index, route="/", title="MentorAI \U0001f9e0 | Orientaci\u00f3n Profesional Vocacional")
