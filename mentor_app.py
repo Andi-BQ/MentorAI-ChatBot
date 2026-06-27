@@ -19,105 +19,147 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-    * { font-family: 'Inter', -apple-system, sans-serif !important; }
+    * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important; }
+
     .stApp { background: #F8FAFC; }
-    header, footer, .stDeployButton, section[data-testid="stSidebar"] { display: none !important; }
 
-    /* Contenedor central de la app */
-    .block-container { max-width: 800px !important; padding-top: 100px !important; margin: 0 auto !important; }
+    header, footer, #MainMenu, .stDeployButton, section[data-testid="stSidebar"] { display: none !important; }
 
-    /* ── Barra Superior Profesional (Fix de Iconos Rompibles) ── */
-    .appbar {
+    .block-container {
+        max-width: 800px !important;
+        padding-top: 85px !important;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+        margin: 0 auto !important;
+        background: transparent !important;
+    }
+
+    .main > div::-webkit-scrollbar { width: 6px; }
+    .main > div::-webkit-scrollbar-track { background: transparent; }
+    .main > div::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+
+    .appbar-container {
         position: fixed; top: 0; left: 50%; transform: translateX(-50%);
         width: 100%; max-width: 800px; height: 65px;
         background: #FFFFFF; border-bottom: 1px solid #E2E8F0;
         z-index: 999; padding: 0 24px;
         display: flex; align-items: center; justify-content: space-between;
+        box-sizing: border-box;
     }
-    .appbar-logo { font-size: 1.2rem; font-weight: 700; color: #00288E; display: flex; align-items: center; gap: 8px; }
-    .appbar-nav { display: flex; gap: 24px; align-items: center; }
-    .appbar-nav span { font-size: 0.9rem; color: #64748B; cursor: pointer; font-weight: 500; transition: color 0.15s; }
-    .appbar-nav span.active { color: #00288E; font-weight: 600; border-bottom: 2px solid #00288E; padding-bottom: 20px; }
-    .appbar-actions { display: flex; gap: 16px; align-items: center; color: #64748B; }
-    .appbar-actions svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; cursor: pointer; }
+    .appbar-logo {
+        font-size: 1.25rem; font-weight: 700; color: #00288E;
+        user-select: none; display: flex; align-items: center; gap: 8px;
+    }
+    .appbar-right-zone {
+        display: flex; gap: 8px; align-items: center;
+    }
 
-    /* ── Burbujas de Chat Premium ── */
-    div[data-testid="stChatMessage"] { background: transparent !important; margin-bottom: 20px !important; padding: 0 !important; }
+    div[data-testid="stPopover"] > button {
+        background: transparent !important; border: none !important; padding: 6px !important;
+        color: #64748B !important; width: 36px !important; height: 36px !important;
+        display: flex !important; align-items: center !important; justify-content: center !important;
+        border-radius: 50% !important; box-shadow: none !important; transition: background 0.15s !important;
+    }
+    div[data-testid="stPopover"] > button:hover {
+        background: #F1F5F9 !important; color: #00288E !important;
+    }
+    div[data-testid="stPopover"] svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+    div[data-testid="stChatMessage"] {
+        padding: 0 !important; margin: 0 0 20px 0 !important;
+        border: none !important; background: transparent !important;
+    }
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) {
-        background: #EFF6FF !important; border: 1px solid #BFDBFE !important; border-radius: 20px 20px 4px 20px !important;
-        padding: 14px 18px !important; max-width: 80% !important; margin-left: auto !important;
+        background: #EFF6FF !important; border: 1px solid #BFDBFE !important;
+        border-radius: 20px 20px 4px 20px !important; padding: 14px 18px !important;
+        margin: 0 0 20px auto !important; max-width: 80% !important;
     }
     div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) {
-        background: #FFFFFF !important; border: 1px solid #E2E8F0 !important; border-radius: 20px 20px 20px 4px !important;
-        padding: 18px 20px !important; max-width: 90% !important; box-shadow: 0 4px 12px rgba(0,0,0,0.02) !important;
+        background: #FFFFFF !important; border: 1px solid #E2E8F0 !important;
+        border-radius: 20px 20px 20px 4px !important; padding: 18px 20px !important;
+        margin: 0 auto 20px 0 !important; max-width: 90% !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.02) !important;
     }
+    div[data-testid="stChatMessage"] p, div[data-testid="stChatMessage"] span { color: #1E293B !important; font-size: 0.98rem; line-height: 1.5; }
     div[data-testid="chatAvatarIcon-user"], div[data-testid="chatAvatarIcon-assistant"] { display: none !important; }
 
-    /* ── CAJA ESTILO GEMINI (Píldora Unificada) ── */
     div[data-testid="stChatInput"] {
         position: fixed !important; bottom: 20px !important; left: 50% !important; transform: translateX(-50%) !important;
         max-width: 800px !important; width: calc(100% - 32px) !important; padding: 0 !important; background: transparent !important; z-index: 999 !important;
     }
     div[data-testid="stChatInput"] > div {
         background: #FFFFFF !important; border: 1px solid #CBD5E1 !important; border-radius: 32px !important;
-        padding: 4px 6px 4px 12px !important; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.06) !important;
-        display: flex !important; align-items: center !important;
+        padding: 4px 6px 4px 14px !important; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.06) !important;
     }
     div[data-testid="stChatInput"] textarea {
         border: none !important; background: transparent !important; box-shadow: none !important;
-        padding: 12px 90px 12px 14px !important; /* Espacio reservado para el micro flotante */
-        font-size: 0.98rem !important; color: #1E293B !important;
+        padding: 12px 105px 12px 0px !important;
+        font-size: 0.98rem !important; color: #1E293B !important; min-height: 48px !important;
     }
 
-    /* Botón enviar circular azul */
     div[data-testid="stChatInput"] button {
         background: #2563EB !important; color: #FFFFFF !important; border-radius: 50% !important;
         width: 40px !important; height: 40px !important; display: flex !important; align-items: center !important; justify-content: center !important;
+        position: absolute !important; right: 8px !important; bottom: 8px !important; border: none !important; z-index: 1002 !important;
     }
-    div[data-testid="stChatInput"] button::before { content: "↑" !important; font-size: 1.4rem !important; font-weight: bold; }
+    div[data-testid="stChatInput"] button::before { content: "↑" !important; font-size: 1.4rem !important; font-weight: 700 !important; }
     div[data-testid="stChatInput"] button svg { display: none !important; }
+    div[data-testid="stChatInput"] button:hover { background: #1D4ED8 !important; }
 
-    /* ── MICRÓFONO INCRUSTADO A LA DERECHA ── */
-    .mic-container { position: fixed; bottom: 27px; left: calc(50% + 400px - 105px); z-index: 1000; }
-    @media (max-width: 832px) { .mic-container { left: auto; right: 75px; } }
+    .mic-container {
+        position: fixed;
+        bottom: 28px;
+        left: calc(50% + 400px - 102px);
+        z-index: 1001;
+    }
+    @media (max-width: 832px) {
+        .mic-container { left: auto; right: 58px; }
+    }
     .mic-container button {
-        border: none !important; background: transparent !important; width: 36px !important; height: 36px !important;
+        border: none !important; background: transparent !important; width: 40px !important; height: 40px !important;
         display: flex !important; align-items: center !important; justify-content: center !important;
         color: #64748B !important; font-size: 1.25rem !important; cursor: pointer !important; box-shadow: none !important;
     }
     .mic-container button:hover { color: #2563EB !important; background: #F1F5F9 !important; border-radius: 50% !important; }
 
-    /* Sugerencias en Grilla */
     .stButton > button {
         background: #FFFFFF !important; color: #334155 !important; border: 1px solid #E2E8F0 !important;
-        border-radius: 14px !important; height: 50px !important; font-size: 0.92rem !important; font-weight: 500 !important;
-        transition: all 0.2s !important; width: 100% !important;
+        border-radius: 16px !important; height: 52px !important; font-size: 0.95rem !important; font-weight: 500 !important;
+        transition: all 0.2s ease !important; width: 100% !important;
     }
     .stButton > button:hover { border-color: #3B82F6 !important; background: #EFF6FF !important; color: #1D4ED8 !important; transform: translateY(-1px); }
-    .main > div { padding-bottom: 110px !important; }
+
+    .main > div { padding-bottom: 120px !important; }
+    hr { margin: 24px 0 !important; border: none !important; border-top: 1px solid #E2E8F0 !important; }
 </style>
 """, unsafe_allow_html=True)
 
 # ============================================================
-# TOP APPBAR
+# TOP APPBAR CON POPOVERS INTERACTIVOS
 # ============================================================
-st.markdown("""
-<div class="appbar">
-    <div class="appbar-logo">🧠 MentorAI</div>
-    <div class="appbar-nav">
-        <span class="active">Consultas</span>
-        <span>Progreso</span>
-        <span>Recursos</span>
-    </div>
-    <div class="appbar-actions">
-        <svg viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+st.markdown('<div class="appbar-container"><div class="appbar-logo">🧠 MentorAI</div><div class="appbar-right-zone">', unsafe_allow_html=True)
+
+col_icon1, col_icon2 = st.columns([1, 1])
+
+with col_icon1:
+    with st.popover("⚙️", help="Configuración del Sistema"):
+        st.markdown("### ⚙️ Preferencias")
+        st.toggle("Modo oscuro simulado", value=False)
+        st.slider("Temperatura del Modelo", 0.0, 1.0, 0.7)
+        st.caption("Ajustes aplicados al motor Llama-3.3")
+
+with col_icon2:
+    with st.popover("👤", help="Ver Perfil"):
+        st.markdown("### 👤 Sesión de Estudiante")
+        st.info("Estado: Evaluando Competencias")
+        if st.button("Limpiar Chat e Historial"):
+            for key in list(st.session_state.keys()): del st.session_state[key]
+            st.rerun()
+
+st.markdown('</div></div>', unsafe_allow_html=True)
 
 # ============================================================
-# 2. CARGA DEL MOTOR XGBOOST
+# 2. CARGA DEL MOTOR RECOMENDADOR
 # ============================================================
 @st.cache_resource
 def load_mentor_engine():
@@ -128,141 +170,70 @@ def load_mentor_engine():
         class MockEngine:
             def recommend(self, perfil, top_k=5, include_details=True):
                 import random
-                carreras = [
-                    "Datos e IA",
-                    "Tecnología Core",
-                    "Diseño UX/UI",
-                    "Negocios Tech",
-                    "Marketing Digital"
-                ]
+                carreras = ["Datos e IA", "Tecnología Core", "Diseño UX/UI", "Negocios Tech", "Marketing Digital"]
                 random.shuffle(carreras)
-                return [
-                    {
-                        "rank": i + 1,
-                        "carrera": c,
-                        "confidence": round(random.uniform(70, 95) - (i * 3), 1)
-                    }
-                    for i, c in enumerate(carreras[:top_k])
-                ]
+                return [{"rank": i + 1, "carrera": c, "confidence": round(random.uniform(70, 95) - (i * 3), 1)} for i, c in enumerate(carreras[:top_k])]
         return MockEngine()
 
 engine = load_mentor_engine()
 
 # ============================================================
-# 3. CONFIGURACIÓN GROQ
+# 3. CONFIGURACIÓN API
 # ============================================================
 API_KEY = st.secrets.get("GROQ_API_KEY", "")
 if not API_KEY:
-    st.error("⚠️ Configura GROQ_API_KEY en los Secrets de Streamlit.")
+    st.error("⚠️ Configura GROQ_API_KEY en tus Secrets de Streamlit.")
     st.stop()
 
-client = OpenAI(
-    api_key=API_KEY,
-    base_url="https://api.groq.com/openai/v1"
-)
+client = OpenAI(api_key=API_KEY, base_url="https://api.groq.com/openai/v1")
 
 SYSTEM_PROMPT = """
 Eres MentorAI, un orientador vocacional empático y conversacional.
-Tu objetivo es evaluar al usuario en 13 áreas (del 1 al 10), además de conocer su 'age' (edad) y 'education' (1=Secundaria, 2=Universidad, 3=Maestría, 4=Doctorado).
-
-Las 13 áreas son: analytical, logical_reasoning, problem_solving, creativity, design, communication, empathy, social, teamwork, leadership, technology, business, stress_tolerance.
+Evalúa al usuario en 13 áreas (del 1 al 10), además de conocer su 'age' y 'education' (1=Secundaria, 2=Universidad, 3=Maestría, 4=Doctorado).
+Áreas: analytical, logical_reasoning, problem_solving, creativity, design, communication, empathy, social, teamwork, leadership, technology, business, stress_tolerance.
 
 REGLAS:
-1. NO hagas una lista aburrida de preguntas. Haz preguntas conversacionales e indaga sobre sus gustos. Haz máximo 2 o 3 preguntas a la vez.
-2. Ve estimando internamente su puntaje del 1 al 10 en cada área según lo que responda.
-3. CUANDO YA TENGAS SUFICIENTE INFORMACIÓN para estimar los 15 valores, DEJA DE HABLAR normalmente.
-4. Tu ÚLTIMO mensaje debe ser ÚNICAMENTE un bloque de código JSON con esta estructura exacta (sin texto antes ni después):
-
-```json
-{
-  "analytical": 8,
-  "logical_reasoning": 7,
-  "problem_solving": 9,
-  "creativity": 4,
-  "design": 3,
-  "communication": 8,
-  "empathy": 9,
-  "social": 8,
-  "teamwork": 10,
-  "leadership": 7,
-  "technology": 6,
-  "business": 5,
-  "stress_tolerance": 8,
-  "age": 22,
-  "education": 2
-}
+1. Haz preguntas fluidas e investiga sus pasiones. Máximo 2 preguntas por mensaje.
+2. Cuando tengas datos suficientes para los 15 valores, corta la conversación y responde ÚNICAMENTE con el bloque JSON solicitado.
 """
 
-# ============================================================
-# 4. ESTADO DE SESIÓN
-# ============================================================
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
-        {
-            "role": "assistant",
-            "content": (
-                "¡Hola! Soy MentorAI 🧠. Cuéntame un poco sobre ti: "
-                "¿qué actividades o materias disfrutas más en tu día a día?"
-            )
-        }
+        {"role": "assistant", "content": "¡Hola! Soy MentorAI 🧠. Cuéntame un poco sobre ti: ¿qué actividades o materias disfrutas más en tu día a día?"}
     ]
     st.session_state.finished = False
 
-# ============================================================
-# 5. FUNCIÓN AUXILIAR
-# ============================================================
 def extract_json(text):
     match = re.search(r'\{.*?\}', text, re.DOTALL)
     if match:
         try:
             data = json.loads(match.group())
-            required_keys = {
-                "analytical", "logical_reasoning", "problem_solving",
-                "creativity", "design", "communication", "empathy",
-                "social", "teamwork", "leadership", "technology",
-                "business", "stress_tolerance", "age", "education"
-            }
-            if required_keys.issubset(data.keys()):
-                return data
-        except (json.JSONDecodeError, ValueError):
-            pass
+            required_keys = {"analytical", "logical_reasoning", "problem_solving", "creativity", "design", "communication", "empathy", "social", "teamwork", "leadership", "technology", "business", "stress_tolerance", "age", "education"}
+            if required_keys.issubset(data.keys()): return data
+        except: pass
     return None
 
 # ============================================================
-# 6. CHAT - Messages
+# 4. RENDERING DE MENSAJES
 # ============================================================
 for msg in st.session_state.messages:
     if msg["role"] != "system":
-        avatar = "👤" if msg["role"] == "user" else "🧠"
-        with st.chat_message(msg["role"], avatar=avatar):
+        with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-# ============================================================
-# 7. SUGGESTION CARDS (only before first user interaction)
-# ============================================================
-if "suggestion" not in st.session_state:
-    st.session_state.suggestion = None
-
-has_user_msgs = any(m["role"] == "user" for m in st.session_state.messages)
-if not has_user_msgs and not st.session_state.get("suggestion"):
-    st.markdown('<p style="text-align:center;color:#64748B;font-size:0.85rem;margin:20px 0 8px;font-weight:500;">¿Por dónde quieres empezar?</p>', unsafe_allow_html=True)
-    g1, g2, g3 = st.columns(3, gap="small")
-    with g1:
-        if st.button("🎓 Explorar carreras", key="sug_carreras", use_container_width=True):
-            st.session_state.suggestion = "Quiero explorar opciones de carrera profesional"
-            st.rerun()
-    with g2:
-        if st.button("💡 Descubrir fortalezas", key="sug_fortalezas", use_container_width=True):
-            st.session_state.suggestion = "Ayúdame a descubrir mis fortalezas y habilidades"
-            st.rerun()
-    with g3:
-        if st.button("🚀 Planificar futuro", key="sug_plan", use_container_width=True):
-            st.session_state.suggestion = "Necesito ayuda para planificar mi futuro profesional"
-            st.rerun()
+if len(st.session_state.messages) == 2 and not st.session_state.finished:
+    st.markdown("<p style='text-align:center; color:#64748B; font-weight:500; margin-top:20px; margin-bottom:12px;'>¿Por dónde quieres empezar?</p>", unsafe_allow_html=True)
+    col_s1, col_s2, col_s3 = st.columns(3)
+    with col_s1:
+        if st.button("🎓 Explorar carreras"): st.session_state.messages.append({"role": "user", "content": "Quiero empezar explorando mis opciones de carreras profesionales."}) ; st.rerun()
+    with col_s2:
+        if st.button("💡 Descubrir fortalezas"): st.session_state.messages.append({"role": "user", "content": "Me gustaría analizar cuáles son mis mayores habilidades y fortalezas."}) ; st.rerun()
+    with col_s3:
+        if st.button("🚀 Planificar futuro"): st.session_state.messages.append({"role": "user", "content": "Quiero armar una estrategia paso a paso para mi desarrollo futuro."}) ; st.rerun()
 
 # ============================================================
-# 8. VOICE INPUT
+# 5. ENTRADA DE AUDIO
 # ============================================================
 voice_prompt = None
 if not st.session_state.finished:
@@ -271,52 +242,32 @@ if not st.session_state.finished:
     st.markdown('</div>', unsafe_allow_html=True)
     if audio is not None:
         try:
-            with st.spinner("Transcribiendo audio..."):
-                result = client.audio.transcriptions.create(
-                    model="whisper-large-v3",
-                    file=("audio.wav", audio["bytes"], "audio/wav")
-                )
+            with st.spinner("Transcribiendo..."):
+                result = client.audio.transcriptions.create(model="whisper-large-v3", file=("audio.wav", audio["bytes"], "audio/wav"))
                 voice_prompt = result.text
         except Exception as e:
-            st.error(f"Error al transcribir audio: {e}")
+            st.error(f"Error en audio: {e}")
 
 # ============================================================
-# 9. TEXT INPUT & PROCESSING
+# 6. ENTRADA DE TEXTO Y PROCESAMIENTO
 # ============================================================
-if st.session_state.get("suggestion"):
-    prompt = st.session_state.suggestion
-    st.session_state.suggestion = None
-else:
-    prompt = voice_prompt or st.chat_input(
-        "Escribe tu respuesta aquí..."
-        if not st.session_state.finished
-        else "La evaluación ha finalizado"
-    )
+prompt = voice_prompt or st.chat_input("Escribe tu respuesta aquí..." if not st.session_state.finished else "Evaluación finalizada")
 
 if prompt and not st.session_state.finished:
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user", avatar="👤"):
-        st.markdown(prompt)
+    st.rerun()
 
-    with st.chat_message("assistant", avatar="🧠"):
+if len(st.session_state.messages) > 2 and st.session_state.messages[-1]["role"] == "user" and not st.session_state.finished:
+    with st.chat_message("assistant"):
         message_placeholder = st.empty()
         try:
-            response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=st.session_state.messages,
-                temperature=0.7
-            )
+            response = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=st.session_state.messages, temperature=0.7)
             llm_reply = response.choices[0].message.content
-
             datos_llm = extract_json(llm_reply)
+
             if datos_llm:
                 st.session_state.finished = True
-                with st.spinner("Analizando tus respuestas..."):
-                    import time
-                    time.sleep(0.5)
-                message_placeholder.success(
-                    "✅ ¡Perfil completado! Generando tu mapa vocacional..."
-                )
+                message_placeholder.success("✅ ¡Perfil completado! Generando mapa vocacional...")
 
                 edu_map = {1: 0.3, 2: 0.5, 3: 0.7, 4: 0.9}
                 perfil_usuario = {
@@ -337,138 +288,35 @@ if prompt and not st.session_state.finished:
                     "age": min(datos_llm.get("age", 20) / 65.0, 1.0)
                 }
 
-                recomendaciones = engine.recommend(
-                    perfil_usuario, top_k=3, include_details=True
-                )
+                recomendaciones = engine.recommend(perfil_usuario, top_k=3, include_details=True)
                 df_res = pd.DataFrame(recomendaciones)
                 top_1 = df_res.iloc[0]
 
                 st.markdown("---")
-                st.markdown(
-                    f"<h2 style='text-align:center; color:#1E293B; font-size:1.3rem;'>"
-                    f"🎯 Tu carrera ideal: "
-                    f"<span style='color:#2563EB;'>{top_1['carrera'].replace('_', ' ').title()}</span>"
-                    f"</h2>",
-                    unsafe_allow_html=True
-                )
+                st.markdown(f"<h2 style='text-align:center; color:#1E293B; font-size:1.3rem;'>🎯 Tu carrera ideal: <span style='color:#2563EB;'>{top_1['carrera'].replace('_', ' ').title()}</span></h2>", unsafe_allow_html=True)
 
                 c1, c2 = st.columns(2, gap="medium")
-
                 with c1:
-                    labels = [
-                        "Analítico", "Razonamiento", "Problemas",
-                        "Creatividad", "Diseño", "Comunicación",
-                        "Empatía", "Social", "Trabajo en Equipo",
-                        "Liderazgo", "Tecnología", "Negocios",
-                        "Tolerancia al Estrés"
-                    ]
-                    values = [
-                        datos_llm.get("analytical", 5),
-                        datos_llm.get("logical_reasoning", 5),
-                        datos_llm.get("problem_solving", 5),
-                        datos_llm.get("creativity", 5),
-                        datos_llm.get("design", 5),
-                        datos_llm.get("communication", 5),
-                        datos_llm.get("empathy", 5),
-                        datos_llm.get("social", 5),
-                        datos_llm.get("teamwork", 5),
-                        datos_llm.get("leadership", 5),
-                        datos_llm.get("technology", 5),
-                        datos_llm.get("business", 5),
-                        datos_llm.get("stress_tolerance", 5)
-                    ]
+                    labels = ["Analítico", "Razonamiento", "Problemas", "Creatividad", "Diseño", "Comunicación", "Empatía", "Social", "Trabajo en Equipo", "Liderazgo", "Tecnología", "Negocios", "Tolerancia Estrés"]
+                    values = [datos_llm.get(k, 5) for k in ["analytical", "logical_reasoning", "problem_solving", "creativity", "design", "communication", "empathy", "social", "teamwork", "leadership", "technology", "business", "stress_tolerance"]]
                     fig_radar = go.Figure()
-                    fig_radar.add_trace(go.Scatterpolar(
-                        r=values + [values[0]],
-                        theta=labels + [labels[0]],
-                        fill="toself",
-                        fillcolor="rgba(37, 99, 235, 0.2)",
-                        line=dict(color="#2563EB", width=2.5),
-                        name="Tu perfil"
-                    ))
-                    fig_radar.update_layout(
-                        polar=dict(
-                            radialaxis=dict(
-                                visible=True,
-                                range=[0, 10],
-                                tickfont=dict(size=9, color="#94A3B8"),
-                                gridcolor="#E2E8F0"
-                            ),
-                            angularaxis=dict(
-                                tickfont=dict(size=9, color="#475569")
-                            ),
-                            bgcolor="rgba(0,0,0,0)"
-                        ),
-                        paper_bgcolor="rgba(0,0,0,0)",
-                        showlegend=False,
-                        height=320,
-                        margin=dict(l=40, r=40, t=10, b=10)
-                    )
+                    fig_radar.add_trace(go.Scatterpolar(r=values + [values[0]], theta=labels + [labels[0]], fill="toself", fillcolor="rgba(37, 99, 235, 0.2)", line=dict(color="#2563EB", width=2.5)))
+                    fig_radar.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 10], tickfont=dict(size=9, color="#94A3B8"), gridcolor="#E2E8F0"), angularaxis=dict(tickfont=dict(size=9, color="#475569")), bgcolor="rgba(0,0,0,0)"), paper_bgcolor="rgba(0,0,0,0)", showlegend=False, height=320, margin=dict(l=40, r=40, t=10, b=10))
                     st.plotly_chart(fig_radar, width="stretch")
 
                 with c2:
-                    fig_bar = go.Figure(go.Bar(
-                        x=df_res["confidence"],
-                        y=df_res["carrera"].str.replace("_", " ").str.title(),
-                        orientation="h",
-                        marker=dict(
-                            color=df_res["confidence"],
-                            colorscale=[[0, "#BFDBFE"], [1, "#2563EB"]]
-                        ),
-                        text=df_res["confidence"].apply(lambda v: f"{v}%"),
-                        textposition="outside",
-                        textfont=dict(size=12, color="#1E293B")
-                    ))
-                    fig_bar.update_layout(
-                        yaxis=dict(
-                            autorange="reversed",
-                            tickfont=dict(size=12, color="#1E293B")
-                        ),
-                        xaxis=dict(range=[0, 100], visible=False),
-                        height=240,
-                        margin=dict(l=10, r=40, t=10, b=10),
-                        paper_bgcolor="rgba(0,0,0,0)",
-                        plot_bgcolor="rgba(0,0,0,0)",
-                        showlegend=False
-                    )
+                    fig_bar = go.Figure(go.Bar(x=df_res["confidence"], y=df_res["carrera"].str.replace("_", " ").str.title(), orientation="h", marker=dict(color=df_res["confidence"], colorscale=[[0, "#BFDBFE"], [1, "#2563EB"]]), text=df_res["confidence"].apply(lambda v: f"{v}%"), textposition="outside"))
+                    fig_bar.update_layout(yaxis=dict(autorange="reversed", tickfont=dict(size=12, color="#1E293B")), xaxis=dict(range=[0, 100], visible=False), height=240, margin=dict(l=10, r=40, t=10, b=10), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", showlegend=False)
                     st.plotly_chart(fig_bar, width="stretch")
 
                 st.markdown("---")
-                if st.button(
-                    "🔄 Volver a comenzar",
-                    use_container_width=True,
-                    type="primary"
-                ):
-                    for key in list(st.session_state.keys()):
-                        del st.session_state[key]
+                if st.button("🔄 Volver a comenzar", use_container_width=True, type="primary"):
+                    for key in list(st.session_state.keys()): del st.session_state[key]
                     st.session_state.finished = False
-                    st.session_state.messages = [
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "assistant", "content": "¡Hola! Soy MentorAI 🧠. Cuéntame un poco sobre ti: ¿qué actividades o materias disfrutas más?"}
-                    ]
                     st.rerun()
-
             else:
-                st.session_state.messages.append(
-                    {"role": "assistant", "content": llm_reply}
-                )
+                st.session_state.messages.append({"role": "assistant", "content": llm_reply})
                 message_placeholder.markdown(llm_reply)
-
+                st.rerun()
         except Exception as e:
             message_placeholder.error(f"Error de API: {e}")
-
-# ============================================================
-# REQUIREMENTS.TXT
-# ============================================================
-# Crea un archivo requirements.txt con:
-#
-# streamlit>=1.28.0
-# pandas>=1.5.0
-# numpy>=1.24.0
-# plotly>=5.15.0
-# joblib>=1.2.0
-# openai>=1.0.0
-# streamlit-mic-recorder>=0.0.8
-#
-# Secrets (.streamlit/secrets.toml):
-# GROQ_API_KEY = "tu-api-key-de-groq-aqui"
