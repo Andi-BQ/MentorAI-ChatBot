@@ -8,3 +8,4 @@ pandas>=3.0.0
 joblib>=1.4.0
 scipy>=1.13.0
 plotly
+streamlit-mic-recorder>=0.0.8
