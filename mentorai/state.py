@@ -7,12 +7,15 @@ from typing import Dict, List, Any, Optional
 
 import reflex as rx
 import joblib
+from dotenv import load_dotenv
 from openai import OpenAI
 import plotly.graph_objects as go
 
-API_KEY = os.environ.get("GROQ_API_KEY", "")
+load_dotenv()
+
+API_KEY = os.getenv("GROQ_API_KEY", "")
 if not API_KEY:
-    print("⚠️  GROQ_API_KEY no configurada. Crea un archivo .env con GROQ_API_KEY=tu_key")
+    print("ℹ️  GROQ_API_KEY no encontrada. Configúrala como variable de entorno en Reflex Cloud o crea un archivo .env.")
 
 client = None
 if API_KEY:
@@ -228,7 +231,7 @@ class State(rx.State):
         if not client:
             self.messages.append({
                 "role": "assistant",
-                "content": "⚠️ Error: GROQ_API_KEY no configurada. Crea un archivo .env en la raíz del proyecto.",
+                "content": "⚠️ GROQ_API_KEY no configurada. Agrégala como variable de entorno en Reflex Cloud (Settings → Secrets) o crea un archivo .env en la raíz del proyecto.",
             })
             self.loading = False
             return
