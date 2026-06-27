@@ -264,5 +264,6 @@ app = rx.App(
         rx.el.link(rel="stylesheet", href="/style.css"),
         rx.el.script(src="/mic.js"),
     ],
+    tailwind={},
 )
 app.add_page(index, route="/", title="MentorAI 🧠")
