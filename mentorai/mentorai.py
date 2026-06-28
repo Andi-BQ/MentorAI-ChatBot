@@ -201,12 +201,13 @@ def input_pill():
                 on_change=State.set_input,
                 placeholder="Escribe tu mensaje aquí...",
                 on_key_down=State.handle_keyboard,
-                class_name=rx.cond(
-                    rx.color_mode == "light",
-                    "w-full bg-transparent border-none focus:ring-0 text-slate-900 placeholder-slate-400 resize-none",
-                    "w-full bg-transparent border-none focus:ring-0 text-white placeholder-slate-500 resize-none",
-                ),
-                style={"minHeight": "44px", "maxHeight": "140px"},
+                class_name="w-full bg-transparent border-none focus:ring-0 placeholder-slate-400 resize-none",
+                style={
+                    "color": rx.cond(rx.color_mode == "light", "#0f172a", "#f8fafc"),
+                    "minHeight": "44px",
+                    "maxHeight": "140px",
+                    "width": "100%",
+                },
             ),
             rx.hstack(
                 rx.button(
