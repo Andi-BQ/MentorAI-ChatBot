@@ -10,6 +10,7 @@ import joblib
 from dotenv import load_dotenv
 from openai import OpenAI
 import plotly.graph_objects as go
+import numpy as np
 
 load_dotenv()
 
@@ -212,6 +213,7 @@ class State(rx.State):
 
     def handle_keyboard(self, e: str):
         if e == "Enter":
+            self.show_suggestions = self.show_suggestions
             return State.send_from_input
 
     def send_from_input(self):
@@ -288,6 +290,10 @@ class State(rx.State):
                 recomendaciones = engine.recommend(
                     perfil_usuario, top_k=3, include_details=True
                 )
+                recomendaciones = [
+                    {k: (v.item() if hasattr(v, 'item') else v) for k, v in r.items()}
+                    for r in recomendaciones
+                ]
                 self.recommendations = recomendaciones
                 self.top_career = (
                     recomendaciones[0]["carrera"] if recomendaciones else ""

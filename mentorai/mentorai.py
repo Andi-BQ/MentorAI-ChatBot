@@ -439,4 +439,4 @@ app = rx.App(
         rx.el.script(src="/mic.js"),
     ],
 )
-app.add_page(index, route="/", title="MentorAI \U0001f9e0 | Orientaci\u00f3n Profesional Vocacional")
+app.add_page(index, route="/", title="MentorAI \U0001f9e0 | Orientaci\u00f3n Profesional Vocacional", on_load=State.init_chat)
