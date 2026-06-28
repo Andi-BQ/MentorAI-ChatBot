@@ -14,9 +14,15 @@ def render_chat_message(msg):
                 rx.text(
                     msg["content"],
                     class_name="font-medium break-words",
-                    style={"color": "#ffffff"},
+                    style={
+                        "color": rx.cond(rx.color_mode == "light", "#1e293b", "#ffffff"),
+                    },
                 ),
-                class_name="bg-gradient-to-r from-blue-600 to-cyan-500 p-3 rounded-2xl max-w-[70%] shadow-sm",
+                class_name=rx.cond(
+                    rx.color_mode == "light",
+                    "bg-indigo-100 border border-indigo-200 p-3 rounded-2xl max-w-[70%] shadow-sm",
+                    "bg-gradient-to-r from-blue-600 to-cyan-500 p-3 rounded-2xl max-w-[70%] shadow-sm",
+                ),
             ),
             class_name="w-full justify-end px-4 py-2",
         ),
