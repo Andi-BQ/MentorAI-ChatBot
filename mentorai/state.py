@@ -168,6 +168,8 @@ class State(rx.State):
     show_settings: bool = False
     show_profile: bool = False
 
+    _input_synced = False
+
     top_career: str = ""
     recommendations: List[Dict[str, Any]] = []
     radar_html: str = ""
@@ -186,6 +188,7 @@ class State(rx.State):
         self.loading = False
         self.is_recording = False
         self.input_text = ""
+        self._input_synced = False
         self.show_settings = False
         self.show_profile = False
         self.top_career = ""
@@ -209,14 +212,19 @@ class State(rx.State):
         self.temperature = value
 
     def set_input(self, value: str):
+        if self._input_synced:
+            self._input_synced = False
+            return
         self.input_text = value
 
     def handle_keyboard(self, e: str):
         if e == "Enter":
+            self._input_synced = True
             return [rx.prevent_default, State.send_from_input]
 
     async def send_from_input(self):
         if not self.input_text.strip() or self.finished:
+            self._input_synced = False
             return
         msg = self.input_text.strip()
         self.input_text = ""
@@ -227,6 +235,10 @@ class State(rx.State):
         yield State.process_chat
 
     def send_suggestion(self, text: str):
+        if self.finished:
+            return
+        self.input_text = ""
+        self._input_synced = True
         self.messages.append({"role": "user", "content": text})
         self.show_suggestions = False
         self.loading = True
@@ -235,6 +247,8 @@ class State(rx.State):
     def send_message(self, text: str):
         if not text.strip() or self.finished:
             return
+        self.input_text = ""
+        self._input_synced = True
         self.messages.append({"role": "user", "content": text.strip()})
         self.show_suggestions = False
         self.loading = True
@@ -321,25 +335,22 @@ class State(rx.State):
 
     def toggle_recording(self):
         if not self.is_recording:
-            return State.start_recording()
+            self.is_recording = True
+            return rx.call_script("window.startMicRecording()")
         else:
-            return State.stop_recording()
-
-    def start_recording(self):
-        self.is_recording = True
-        return rx.call_script("window.startMicRecording()")
-
-    def stop_recording(self):
-        self.is_recording = False
-        return rx.call_script(
-            "window.stopMicRecording()",
-            callback=State.handle_audio_data,
-        )
+            self.is_recording = False
+            return rx.call_script(
+                "window.stopMicRecording()",
+                callback=State.handle_audio_data,
+            )
 
     async def handle_audio_data(self, audio_b64: str):
         if not audio_b64 or not client:
             self.is_recording = False
             return
+        self.input_text = ""
+        self._input_synced = True
+        yield
         self.loading = True
         try:
             clean_b64 = audio_b64.split(",")[-1] if "," in audio_b64 else audio_b64
@@ -352,7 +363,8 @@ class State(rx.State):
             if text:
                 self.messages.append({"role": "user", "content": text})
                 self.show_suggestions = False
-                return State.process_chat
+                yield State.process_chat
+                return
             self.loading = False
         except Exception as e:
             self.messages.append({

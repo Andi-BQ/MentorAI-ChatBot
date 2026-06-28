@@ -5,7 +5,8 @@ from .state import State
 # text-slate-900 text-white placeholder-slate-400 placeholder-slate-500
 # bg-white bg-[#1e293b] text-slate-800 text-slate-100
 # bg-indigo-100 border-indigo-200 bg-gradient-to-r from-blue-600 to-cyan-500
-# bg-red-500 animate-pulse [animation-delay:0.1s] [animation-delay:0.2s]
+# bg-red-500 bg-red-600 overflow-y-auto z-[10000]
+# animate-pulse [animation-delay:0.1s] [animation-delay:0.2s]
 # [animation-delay:0.3s] [animation-delay:0.4s]
 
 # ----------------------------------------------------------------------
@@ -18,57 +19,37 @@ def render_chat_message(msg):
         msg["role"] == "user",
         rx.hstack(
             rx.box(
-                rx.text(
-                    msg["content"],
-                    class_name="font-medium break-words",
-                    style={
-                        "color": rx.cond(rx.color_mode == "light", "#1e293b", "#ffffff"),
-                    },
-                ),
-                class_name=rx.cond(
-                    rx.color_mode == "light",
-                    "bg-indigo-100 border border-indigo-200 p-3 rounded-2xl max-w-[70%] shadow-sm",
-                    "bg-gradient-to-r from-blue-600 to-cyan-500 p-3 rounded-2xl max-w-[70%] shadow-sm",
-                ),
+                rx.text(msg["content"], style={"color": "#ffffff", "fontWeight": "500"}),
+                style={
+                    "backgroundColor": "#2563eb",
+                    "padding": "12px 16px",
+                    "borderRadius": "18px 18px 2px 18px",
+                    "maxWidth": "70%",
+                    "wordBreak": "break-word",
+                },
             ),
-            rx.center(
-                rx.text("\U0001f464", class_name="text-base"),
-                class_name=rx.cond(
-                    rx.color_mode == "light",
-                    "w-9 h-9 rounded-full bg-indigo-200/50 border border-indigo-300/40 flex-shrink-0 shadow-sm",
-                    "w-9 h-9 rounded-full bg-slate-700/60 border border-slate-600/40 flex-shrink-0 shadow-sm",
-                ),
-            ),
-            spacing="2",
-            align="end",
-            class_name="w-full justify-end px-4 py-2",
+            rx.avatar(fallback="U", size="2", color_scheme="indigo"),
+            class_name="w-full justify-end items-end gap-3 px-4 py-2",
         ),
         rx.hstack(
-            rx.center(
-                rx.text("\U0001f9e0", class_name="text-base"),
-                class_name=rx.cond(
-                    rx.color_mode == "light",
-                    "w-9 h-9 rounded-full bg-indigo-100/60 border border-indigo-200/40 flex-shrink-0 shadow-sm",
-                    "w-9 h-9 rounded-full bg-slate-700/80 border border-slate-600/40 flex-shrink-0 shadow-sm",
-                ),
-            ),
+            rx.avatar(fallback="AI", size="2", color_scheme="pink"),
             rx.box(
                 rx.text(
                     msg["content"],
-                    class_name="font-normal break-words",
                     style={
-                        "color": rx.cond(rx.color_mode == "light", "#1e293b", "#f1f5f9"),
+                        "color": rx.cond(rx.color_mode == "light", "#0f172a", "#f8fafc"),
                     },
                 ),
-                class_name=rx.cond(
-                    rx.color_mode == "light",
-                    "bg-white border border-slate-200 p-4 rounded-2xl max-w-[85%] shadow-sm",
-                    "bg-[#1e293b] border border-slate-700 p-4 rounded-2xl max-w-[85%] shadow-md",
-                ),
+                style={
+                    "backgroundColor": rx.cond(rx.color_mode == "light", "#f1f5f9", "#1e293b"),
+                    "border": rx.cond(rx.color_mode == "light", "1px solid #e2e8f0", "1px solid #334155"),
+                    "padding": "14px 18px",
+                    "borderRadius": "18px 18px 18px 2px",
+                    "maxWidth": "75%",
+                    "wordBreak": "break-word",
+                },
             ),
-            spacing="2",
-            align="end",
-            class_name="w-full justify-start px-4 py-2",
+            class_name="w-full justify-start items-end gap-3 px-4 py-2",
         ),
     )
 
@@ -180,7 +161,7 @@ def recording_indicator():
         rx.box(class_name="w-1 h-6 bg-red-500 rounded-full animate-pulse [animation-delay:0.3s]"),
         rx.box(class_name="w-1 h-4 bg-red-500 rounded-full animate-pulse [animation-delay:0.4s]"),
         rx.text(
-            "Grabando audio, presiona el botón para enviar",
+            "\U0001f399\ufe0f Grabando audio... Presiona el bot\u00f3n rojo para detener y enviar",
             class_name=rx.cond(
                 rx.color_mode == "light",
                 "text-xs text-slate-400 font-medium ml-2",
@@ -292,7 +273,7 @@ def input_pill():
                     variant="ghost",
                     class_name=rx.cond(
                         State.is_recording,
-                        "w-10 h-10 rounded-full cursor-pointer flex items-center justify-center border-none bg-red-500 shadow-md",
+                        "w-10 h-10 rounded-full cursor-pointer flex items-center justify-center border-none bg-red-600 shadow-md",
                         rx.cond(
                             rx.color_mode == "light",
                             "w-10 h-10 rounded-full cursor-pointer hover:bg-slate-100 flex items-center justify-center border-none",
@@ -343,12 +324,28 @@ def settings_popup():
                     "Temperatura del modelo",
                     class_name="text-[11px] font-semibold text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-wider",
                 ),
-                rx.select(
-                    ["0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1.0"],
+                rx.select.root(
+                    rx.select.trigger(
+                        variant="surface",
+                        class_name="w-full mt-1 text-xs",
+                    ),
+                    rx.select.content(
+                        rx.select.group(
+                            rx.select.item("0.1", value="0.1"),
+                            rx.select.item("0.2", value="0.2"),
+                            rx.select.item("0.3", value="0.3"),
+                            rx.select.item("0.4", value="0.4"),
+                            rx.select.item("0.5", value="0.5"),
+                            rx.select.item("0.6", value="0.6"),
+                            rx.select.item("0.7", value="0.7"),
+                            rx.select.item("0.8", value="0.8"),
+                            rx.select.item("0.9", value="0.9"),
+                            rx.select.item("1.0", value="1.0"),
+                        ),
+                        style={"zIndex": 9999},
+                    ),
                     default_value="0.7",
                     on_change=State.set_temperature,
-                    variant="surface",
-                    class_name="w-full mt-1 text-xs",
                 ),
                 rx.text(
                     "Arquitectura Llama-3.3 Cloud",
@@ -361,8 +358,8 @@ def settings_popup():
             side_offset=8,
             class_name=rx.cond(
                 rx.color_mode == "light",
-                "bg-white border border-slate-200 rounded-2xl shadow-xl z-50",
-                "bg-[#131c2e] border border-slate-800 rounded-2xl shadow-xl z-50",
+                "bg-white border border-slate-200 rounded-2xl shadow-xl z-30",
+                "bg-[#131c2e] border border-slate-800 rounded-2xl shadow-xl z-30",
             ),
         ),
         open=State.show_settings,
@@ -486,7 +483,8 @@ def index():
                     rx.cond(State.finished, rx.fragment(), typing_indicator()),
                 ),
                 rx.cond(State.finished, results_view()),
-                class_name="max-w-3xl mx-auto pt-24 pb-36 px-3 w-full",
+                class_name="max-w-3xl mx-auto pt-24 pb-40 px-3 w-full overflow-y-auto",
+                style={"maxHeight": "calc(100vh - 180px)"},
             ),
             rx.cond(State.finished, rx.fragment(), input_pill()),
         ),
