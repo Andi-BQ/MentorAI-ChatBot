@@ -291,7 +291,7 @@ def input_pill():
                 ),
                 rx.button(
                     rx.text("\u2191", class_name="text-white font-black text-lg"),
-                    on_click=State.send_from_input,
+                    on_click=State.send_or_stop,
                     style={"background": "linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)"},
                     radius="full",
                     class_name="w-10 h-10 cursor-pointer shadow-md active:scale-95 transition-all duration-150 flex items-center justify-center border-none hover:brightness-110",

@@ -333,6 +333,11 @@ class State(rx.State):
     def reset_chat(self):
         self.init_chat()
 
+    def send_or_stop(self):
+        if self.is_recording:
+            return State.toggle_recording()
+        return State.send_from_input
+
     def toggle_recording(self):
         if not self.is_recording:
             self.is_recording = True
