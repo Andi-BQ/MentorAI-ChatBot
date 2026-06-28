@@ -204,9 +204,9 @@ class State(rx.State):
     def set_input(self, value: str):
         self.input_text = value
 
-    def handle_key_down(self, key):
-        if key == "Enter":
-            return State.send_from_input()
+    def handle_keyboard(self, e: dict):
+        if e.get("key") == "Enter" and not e.get("shiftKey"):
+            return State.send_from_input
 
     def send_from_input(self):
         text = self.input_text.strip()

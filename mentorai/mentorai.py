@@ -7,13 +7,12 @@ from .state import State
 
 
 def user_bubble(content):
-    return rx.box(
-        rx.markdown(content),
-        style={
-            "background": "linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)",
-            "color": "#ffffff",
-        },
-        class_name="rounded-2xl rounded-tr-sm px-5 py-3.5 max-w-[85%] md:max-w-[75%] shadow-[0_4px_20px_rgba(79,70,229,0.25)] text-sm font-medium leading-relaxed animate-fade-in",
+    return rx.hstack(
+        rx.box(
+            rx.text(content, class_name="text-white font-medium break-words"),
+            class_name="bg-gradient-to-r from-blue-600 to-cyan-500 p-3 rounded-2xl max-w-[70%] shadow-sm",
+        ),
+        class_name="w-full justify-end px-4 py-2",
     )
 
 
@@ -32,7 +31,7 @@ def assistant_bubble(content):
 def render_message(msg):
     return rx.cond(
         msg["role"] == "user",
-        rx.box(user_bubble(msg["content"]), class_name="flex justify-end mb-4 w-full px-2"),
+        user_bubble(msg["content"]),
         rx.box(assistant_bubble(msg["content"]), class_name="flex justify-start mb-4 w-full px-2"),
     )
 
@@ -196,15 +195,14 @@ def results_view():
 def input_pill():
     return rx.box(
             rx.hstack(
-                rx.text_area(
-                    value=State.input_text,
-                    on_change=State.set_input,
-                    placeholder="Escribe tu mensaje aquí...",
-                    # Esta sintaxis exacta evita el error de tipos en el validador estático de Reflex
-                on_key_down=State.handle_key_down,
-                    class_name="w-full bg-transparent border-none focus:ring-0 text-inherit resize-none",
-                    style={"minHeight": "44px", "maxHeight": "140px"}
-                ),
+            rx.text_area(
+                value=State.input_text,
+                on_change=State.set_input,
+                placeholder="Escribe tu mensaje aquí...",
+                on_key_down=State.handle_keyboard,
+                class_name="w-full bg-transparent border-none focus:ring-0 text-inherit resize-none",
+                style={"minHeight": "44px", "maxHeight": "140px"},
+            ),
             rx.hstack(
                 rx.button(
                     rx.cond(
@@ -408,13 +406,13 @@ def index():
                 class_name="max-w-3xl mx-auto pt-24 pb-36 px-3 w-full",
             ),
             rx.cond(State.finished, rx.fragment(), input_pill()),
-            class_name=rx.cond(
-                rx.color_mode == "light",
-                "bg-slate-50 text-slate-900 min-h-screen transition-colors duration-200 font-sans select-none",
-                "bg-[#0b0f19] text-white min-h-screen transition-colors duration-200 font-sans select-none",
-            ),
         ),
         color_mode=rx.color_mode,
+        class_name=rx.cond(
+            rx.color_mode == "light",
+            "bg-slate-50 text-slate-900 min-h-screen w-full transition-colors",
+            "bg-[#0b0f19] text-white min-h-screen w-full transition-colors",
+        ),
     )
 
 
