@@ -27,6 +27,10 @@ def load_mentor_engine():
     model_path = os.path.join("modelos", "motor_completo.joblib")
     if os.path.exists(model_path):
         try:
+            # Registrar CareerEngineES en __main__ para que joblib lo encuentre
+            import sys
+            from src.recomendacion.motor_recomendacion import CareerEngineES
+            sys.modules["__main__"].CareerEngineES = CareerEngineES
             return joblib.load(model_path)
         except Exception as e:
             print(f"Error cargando modelo {model_path}: {e}")
@@ -54,6 +58,31 @@ def load_mentor_engine():
 
 
 engine = load_mentor_engine()
+
+# ----------------------------------------------------------------------
+# CARGA DEL MAPA DE TRADUCCIÓN DE CARRERAS (inglés → español)
+# ----------------------------------------------------------------------
+TRANSLATIONS: dict[str, str] = {}
+MACRO_MAP: dict[str, str] = {}
+MACRO_CATEGORIAS: dict[str, str] = {}
+try:
+    trans_path = os.path.join("modelos", "traduccion_carreras.json")
+    if os.path.exists(trans_path):
+        with open(trans_path, "r", encoding="utf-8") as f:
+            trans_data = json.load(f)
+        TRANSLATIONS = trans_data.get("carreras_finas", {})
+        MACRO_MAP = trans_data.get("fino_a_macro", {})
+        MACRO_CATEGORIAS = trans_data.get("macro_categorias", {})
+except Exception as e:
+    print(f"Error cargando traduccion_carreras.json: {e}")
+
+
+def translate_career(key: str) -> str:
+    macro = MACRO_CATEGORIAS.get(key)
+    if macro:
+        return macro
+    return TRANSLATIONS.get(key, key.replace("_", " ").title())
+
 
 SYSTEM_PROMPT = """
 Eres MentorAI, un orientador vocacional empático y conversacional.
@@ -129,7 +158,7 @@ def build_radar_chart(values: List[int]) -> str:
 
 
 def build_bar_chart(recommendations: List[dict]) -> str:
-    labels = [r["carrera"].replace("_", " ").title() for r in recommendations]
+    labels = [r["carrera"] for r in recommendations]
     values = [r["confidence"] for r in recommendations]
     fig = go.Figure(go.Bar(
         x=values,
@@ -309,6 +338,9 @@ class State(rx.State):
                     {k: (v.item() if hasattr(v, 'item') else v) for k, v in r.items()}
                     for r in recomendaciones
                 ]
+                # Traducir nombres de carreras a español
+                for r in recomendaciones:
+                    r["carrera"] = translate_career(r["carrera"])
                 self.recommendations = recomendaciones
                 self.top_career = (
                     recomendaciones[0]["carrera"] if recomendaciones else ""
