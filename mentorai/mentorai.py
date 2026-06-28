@@ -23,8 +23,8 @@ def assistant_bubble(content):
         style={"backdrop-filter": "blur(16px)"},
         class_name=rx.cond(
             rx.color_mode == "light",
-            "rounded-2xl rounded-tl-sm px-5 py-3.5 max-w-[85%] md:max-w-[75%] shadow-xl bg-white/80 text-slate-800 border border-slate-200/50 text-sm leading-relaxed animate-fade-in",
-            "rounded-2xl rounded-tl-sm px-5 py-3.5 max-w-[85%] md:max-w-[75%] shadow-[0_10px_30px_rgba(0,0,0,0.3)] bg-[#131c2e]/60 text-slate-100 border border-slate-800/60 text-sm leading-relaxed animate-fade-in",
+            "rounded-2xl rounded-tl-sm px-5 py-3.5 max-w-[85%] md:max-w-[75%] shadow-xl bg-white/80 text-slate-900 border border-slate-200/50 text-sm leading-relaxed animate-fade-in",
+            "rounded-2xl rounded-tl-sm px-5 py-3.5 max-w-[85%] md:max-w-[75%] shadow-[0_10px_30px_rgba(0,0,0,0.3)] bg-[#131c2e]/90 text-slate-100 border border-slate-800/60 text-sm leading-relaxed animate-fade-in",
         ),
     )
 
@@ -195,18 +195,16 @@ def results_view():
 
 def input_pill():
     return rx.box(
-        rx.hstack(
-            rx.text_area(
-                value=State.input_text,
-                on_change=State.set_input,
-                placeholder="Escribe tu mensaje aqu\u00ed...",
-                on_key_down=lambda e: rx.cond(
-                    (e.key == "Enter") & (~e.shiftKey),
-                    [rx.prevent_default, State.send_from_input()],
+            rx.hstack(
+                rx.text_area(
+                    value=State.input_text,
+                    on_change=State.set_input,
+                    placeholder="Escribe tu mensaje aquí...",
+                    # Esta sintaxis exacta evita el error de tipos en el validador estático de Reflex
+                on_key_down=State.handle_key_down,
+                    class_name="w-full bg-transparent border-none focus:ring-0 text-inherit resize-none",
+                    style={"minHeight": "44px", "maxHeight": "140px"}
                 ),
-                class_name="flex-1 bg-transparent border-none resize-none min-h-[44px] max-h-[140px] text-sm outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500",
-                style={"padding": "12px 14px 12px 16px"},
-            ),
             rx.hstack(
                 rx.button(
                     rx.cond(
@@ -241,7 +239,7 @@ def input_pill():
             ),
             style={"backdrop-filter": "blur(20px)"},
         ),
-        class_name="fixed bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 w-full max-w-3xl px-4 z-50",
+        class_name="fixed bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-24px)] max-w-3xl z-50 px-2",
     )
 
 
@@ -347,73 +345,76 @@ def profile_popup():
 
 
 def index():
-    return rx.box(
+    return rx.theme(
         rx.box(
-            rx.hstack(
+            rx.box(
                 rx.hstack(
-                    rx.center(
-                        rx.text("\U0001f9e0", class_name="text-xl"),
-                        class_name=rx.cond(
-                            rx.color_mode == "light",
-                            "w-9 h-9 bg-indigo-600/10 rounded-xl",
-                            "w-9 h-9 bg-cyan-400/10 rounded-xl",
+                    rx.hstack(
+                        rx.center(
+                            rx.text("\U0001f9e0", class_name="text-xl"),
+                            class_name=rx.cond(
+                                rx.color_mode == "light",
+                                "w-9 h-9 bg-indigo-600/10 rounded-xl",
+                                "w-9 h-9 bg-cyan-400/10 rounded-xl",
+                            ),
                         ),
+                        rx.text("MentorAI", class_name="text-lg font-black tracking-tight"),
+                        class_name="flex items-center gap-2.5",
                     ),
-                    rx.text("MentorAI", class_name="text-lg font-black tracking-tight"),
-                    class_name="flex items-center gap-2.5",
-                ),
-                rx.hstack(
-                    rx.color_mode.button(
-                        variant="ghost",
-                        class_name=rx.cond(
-                            rx.color_mode == "light",
-                            "cursor-pointer rounded-full text-indigo-600 hover:bg-slate-100 w-10 h-10 flex items-center justify-center border-none",
-                            "cursor-pointer rounded-full text-cyan-400 hover:bg-slate-800 w-10 h-10 flex items-center justify-center border-none",
+                    rx.hstack(
+                        rx.color_mode.button(
+                            variant="ghost",
+                            class_name=rx.cond(
+                                rx.color_mode == "light",
+                                "cursor-pointer rounded-full text-indigo-600 hover:bg-slate-100 w-10 h-10 flex items-center justify-center border-none",
+                                "cursor-pointer rounded-full text-cyan-400 hover:bg-slate-800 w-10 h-10 flex items-center justify-center border-none",
+                            ),
                         ),
+                        settings_popup(),
+                        profile_popup(),
+                        spacing="2",
+                        align="center",
                     ),
-                    settings_popup(),
-                    profile_popup(),
-                    spacing="2",
-                    align="center",
+                    class_name="flex items-center justify-between w-full max-w-4xl mx-auto h-full px-4 md:px-6",
                 ),
-                class_name="flex items-center justify-between w-full max-w-4xl mx-auto h-full px-4 md:px-6",
+                class_name=rx.cond(
+                    rx.color_mode == "light",
+                    "fixed top-0 left-0 w-full h-16 border-b border-slate-200/60 z-50 transition-colors duration-300",
+                    "fixed top-0 left-0 w-full h-16 border-b border-slate-800/60 z-50 transition-colors duration-300",
+                ),
+                style={
+                    "background-color": rx.cond(rx.color_mode == "light", "rgba(255,255,255,0.8)", "rgba(11,15,25,0.7)"),
+                    "backdrop-filter": "blur(20px)",
+                },
             ),
+            rx.box(
+                rx.foreach(
+                    State.messages,
+                    lambda msg: rx.cond(
+                        msg["role"] != "system",
+                        render_message(msg),
+                        rx.fragment(),
+                    ),
+                ),
+                rx.cond(
+                    State.show_suggestions,
+                    rx.cond(State.finished, rx.fragment(), suggestions()),
+                ),
+                rx.cond(
+                    State.loading,
+                    rx.cond(State.finished, rx.fragment(), typing_indicator()),
+                ),
+                rx.cond(State.finished, results_view()),
+                class_name="max-w-3xl mx-auto pt-24 pb-36 px-3 w-full",
+            ),
+            rx.cond(State.finished, rx.fragment(), input_pill()),
             class_name=rx.cond(
                 rx.color_mode == "light",
-                "fixed top-0 left-0 w-full h-16 border-b border-slate-200/60 z-50 transition-colors duration-300",
-                "fixed top-0 left-0 w-full h-16 border-b border-slate-800/60 z-50 transition-colors duration-300",
+                "bg-slate-50 text-slate-900 min-h-screen transition-colors duration-200 font-sans select-none",
+                "bg-[#0b0f19] text-white min-h-screen transition-colors duration-200 font-sans select-none",
             ),
-            style={
-                "background-color": rx.cond(rx.color_mode == "light", "rgba(255,255,255,0.8)", "rgba(11,15,25,0.7)"),
-                "backdrop-filter": "blur(20px)",
-            },
         ),
-        rx.box(
-            rx.foreach(
-                State.messages,
-                lambda msg: rx.cond(
-                    msg["role"] != "system",
-                    render_message(msg),
-                    rx.fragment(),
-                ),
-            ),
-            rx.cond(
-                State.show_suggestions,
-                rx.cond(State.finished, rx.fragment(), suggestions()),
-            ),
-            rx.cond(
-                State.loading,
-                rx.cond(State.finished, rx.fragment(), typing_indicator()),
-            ),
-            rx.cond(State.finished, results_view()),
-            class_name="max-w-3xl mx-auto pt-24 pb-36 px-3 w-full",
-        ),
-        rx.cond(State.finished, rx.fragment(), input_pill()),
-        class_name=rx.cond(
-            rx.color_mode == "light",
-            "bg-slate-50 text-slate-900 min-h-screen w-full transition-colors duration-300 font-sans select-none",
-            "bg-[#0b0f19] text-white min-h-screen w-full transition-colors duration-300 font-sans select-none",
-        ),
+        color_mode=rx.color_mode,
     )
 
 

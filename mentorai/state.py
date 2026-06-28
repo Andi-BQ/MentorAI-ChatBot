@@ -204,6 +204,10 @@ class State(rx.State):
     def set_input(self, value: str):
         self.input_text = value
 
+    def handle_key_down(self, key):
+        if key == "Enter":
+            return State.send_from_input()
+
     def send_from_input(self):
         text = self.input_text.strip()
         if text and not self.finished:
