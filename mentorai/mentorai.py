@@ -6,33 +6,34 @@ from .state import State
 # ----------------------------------------------------------------------
 
 
-def user_bubble(content):
-    return rx.hstack(
-        rx.box(
-            rx.text(content, class_name="text-white font-medium break-words"),
-            class_name="bg-gradient-to-r from-blue-600 to-cyan-500 p-3 rounded-2xl max-w-[70%] shadow-sm",
-        ),
-        class_name="w-full justify-end px-4 py-2",
-    )
-
-
-def assistant_bubble(content):
-    return rx.box(
-        rx.markdown(content),
-        style={"backdrop-filter": "blur(16px)"},
-        class_name=rx.cond(
-            rx.color_mode == "light",
-            "rounded-2xl rounded-tl-sm px-5 py-3.5 max-w-[85%] md:max-w-[75%] shadow-xl bg-white/80 text-slate-900 border border-slate-200/50 text-sm leading-relaxed animate-fade-in",
-            "rounded-2xl rounded-tl-sm px-5 py-3.5 max-w-[85%] md:max-w-[75%] shadow-[0_10px_30px_rgba(0,0,0,0.3)] bg-[#131c2e]/90 text-slate-100 border border-slate-800/60 text-sm leading-relaxed animate-fade-in",
-        ),
-    )
-
-
-def render_message(msg):
+def render_chat_message(msg):
     return rx.cond(
         msg["role"] == "user",
-        user_bubble(msg["content"]),
-        rx.box(assistant_bubble(msg["content"]), class_name="flex justify-start mb-4 w-full px-2"),
+        rx.hstack(
+            rx.box(
+                rx.text(msg["content"], class_name="text-white font-medium break-words"),
+                class_name="bg-gradient-to-r from-blue-600 to-cyan-500 p-3 rounded-2xl max-w-[70%] shadow-sm",
+            ),
+            class_name="w-full justify-end px-4 py-2",
+        ),
+        rx.hstack(
+            rx.box(
+                rx.text(
+                    msg["content"],
+                    class_name=rx.cond(
+                        rx.color_mode == "light",
+                        "text-slate-800 font-normal break-words",
+                        "text-slate-100 font-normal break-words",
+                    ),
+                ),
+                class_name=rx.cond(
+                    rx.color_mode == "light",
+                    "bg-white border border-slate-200 p-4 rounded-2xl max-w-[85%] shadow-sm",
+                    "bg-[#1e293b] border border-slate-700 p-4 rounded-2xl max-w-[85%] shadow-md",
+                ),
+            ),
+            class_name="w-full justify-start px-4 py-2",
+        ),
     )
 
 
@@ -390,7 +391,7 @@ def index():
                     State.messages,
                     lambda msg: rx.cond(
                         msg["role"] != "system",
-                        render_message(msg),
+                        render_chat_message(msg),
                         rx.fragment(),
                     ),
                 ),

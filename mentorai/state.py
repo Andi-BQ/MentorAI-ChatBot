@@ -204,8 +204,8 @@ class State(rx.State):
     def set_input(self, value: str):
         self.input_text = value
 
-    def handle_keyboard(self, key: str, info=None):
-        if key == "Enter" and not (info or {}).get("shift_key"):
+    def handle_keyboard(self, e: str):
+        if e == "Enter":
             return State.send_from_input
 
     def send_from_input(self):
