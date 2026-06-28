@@ -215,14 +215,16 @@ class State(rx.State):
         if e == "Enter":
             return [rx.prevent_default, State.send_from_input]
 
-    def send_from_input(self):
-        text = self.input_text.strip()
-        if text and not self.finished:
-            self.messages.append({"role": "user", "content": text})
-            self.input_text = ""
-            self.show_suggestions = False
-            self.loading = True
-            return State.process_chat
+    async def send_from_input(self):
+        if not self.input_text.strip() or self.finished:
+            return
+        msg = self.input_text.strip()
+        self.input_text = ""
+        yield
+        self.messages.append({"role": "user", "content": msg})
+        self.show_suggestions = False
+        self.loading = True
+        yield State.process_chat
 
     def send_suggestion(self, text: str):
         self.messages.append({"role": "user", "content": text})

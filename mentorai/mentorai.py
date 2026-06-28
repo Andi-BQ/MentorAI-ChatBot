@@ -5,6 +5,8 @@ from .state import State
 # text-slate-900 text-white placeholder-slate-400 placeholder-slate-500
 # bg-white bg-[#1e293b] text-slate-800 text-slate-100
 # bg-indigo-100 border-indigo-200 bg-gradient-to-r from-blue-600 to-cyan-500
+# bg-red-500 animate-pulse [animation-delay:0.1s] [animation-delay:0.2s]
+# [animation-delay:0.3s] [animation-delay:0.4s]
 
 # ----------------------------------------------------------------------
 # 1. BURBUJAS DE CHAT ADAPTATIVAS (rx.cond para tema, sin dark:)
@@ -166,7 +168,33 @@ def typing_indicator():
 
 
 # ----------------------------------------------------------------------
-# 4. VISTA DE RESULTADOS FINAL (DASHBOARD PREDICTIVO)
+# 4. INDICADOR DE GRABACIÓN (BARRAS DE AUDIO)
+# ----------------------------------------------------------------------
+
+
+def recording_indicator():
+    return rx.hstack(
+        rx.box(class_name="w-1 h-4 bg-red-500 rounded-full animate-pulse"),
+        rx.box(class_name="w-1 h-6 bg-red-500 rounded-full animate-pulse [animation-delay:0.1s]"),
+        rx.box(class_name="w-1 h-8 bg-red-500 rounded-full animate-pulse [animation-delay:0.2s]"),
+        rx.box(class_name="w-1 h-6 bg-red-500 rounded-full animate-pulse [animation-delay:0.3s]"),
+        rx.box(class_name="w-1 h-4 bg-red-500 rounded-full animate-pulse [animation-delay:0.4s]"),
+        rx.text(
+            "Grabando audio, presiona el botón para enviar",
+            class_name=rx.cond(
+                rx.color_mode == "light",
+                "text-xs text-slate-400 font-medium ml-2",
+                "text-xs text-slate-500 font-medium ml-2",
+            ),
+        ),
+        spacing="1",
+        align="center",
+        class_name="flex-1 px-3",
+    )
+
+
+# ----------------------------------------------------------------------
+# 5. VISTA DE RESULTADOS FINAL (DASHBOARD PREDICTIVO)
 # ----------------------------------------------------------------------
 
 
@@ -231,37 +259,45 @@ def input_pill():
     return rx.box(
         rx.hstack(
             rx.cond(
-                rx.color_mode == "light",
-                rx.text_area(
-                    value=State.input_text,
-                    on_change=State.set_input,
-                    placeholder="Escribe tu mensaje aquí...",
-                    on_key_down=State.handle_keyboard,
-                    class_name="w-full bg-transparent border-none focus:ring-0 text-slate-900 placeholder-slate-400 resize-none",
-                    style={"minHeight": "44px", "maxHeight": "140px", "width": "100%"},
-                ),
-                rx.text_area(
-                    value=State.input_text,
-                    on_change=State.set_input,
-                    placeholder="Escribe tu mensaje aquí...",
-                    on_key_down=State.handle_keyboard,
-                    class_name="w-full bg-transparent border-none focus:ring-0 text-white placeholder-slate-500 resize-none",
-                    style={"minHeight": "44px", "maxHeight": "140px", "width": "100%"},
+                State.is_recording,
+                recording_indicator(),
+                rx.cond(
+                    rx.color_mode == "light",
+                    rx.text_area(
+                        value=State.input_text,
+                        on_change=State.set_input,
+                        placeholder="Escribe tu mensaje aquí...",
+                        on_key_down=State.handle_keyboard,
+                        class_name="w-full bg-transparent border-none focus:ring-0 text-slate-900 placeholder-slate-400 resize-none",
+                        style={"minHeight": "44px", "maxHeight": "140px", "width": "100%"},
+                    ),
+                    rx.text_area(
+                        value=State.input_text,
+                        on_change=State.set_input,
+                        placeholder="Escribe tu mensaje aquí...",
+                        on_key_down=State.handle_keyboard,
+                        class_name="w-full bg-transparent border-none focus:ring-0 text-white placeholder-slate-500 resize-none",
+                        style={"minHeight": "44px", "maxHeight": "140px", "width": "100%"},
+                    ),
                 ),
             ),
             rx.hstack(
                 rx.button(
                     rx.cond(
                         State.is_recording,
-                        rx.text("\u25cf", class_name="text-red-500 text-xl animate-pulse"),
+                        rx.text("\u25a0", class_name="text-white font-black text-sm"),
                         rx.text("\U0001f3a4", class_name="text-base"),
                     ),
                     on_click=State.toggle_recording,
                     variant="ghost",
                     class_name=rx.cond(
-                        rx.color_mode == "light",
-                        "w-10 h-10 rounded-full cursor-pointer hover:bg-slate-100 flex items-center justify-center border-none",
-                        "w-10 h-10 rounded-full cursor-pointer hover:bg-slate-800 flex items-center justify-center border-none",
+                        State.is_recording,
+                        "w-10 h-10 rounded-full cursor-pointer flex items-center justify-center border-none bg-red-500 shadow-md",
+                        rx.cond(
+                            rx.color_mode == "light",
+                            "w-10 h-10 rounded-full cursor-pointer hover:bg-slate-100 flex items-center justify-center border-none",
+                            "w-10 h-10 rounded-full cursor-pointer hover:bg-slate-800 flex items-center justify-center border-none",
+                        ),
                     ),
                 ),
                 rx.button(
