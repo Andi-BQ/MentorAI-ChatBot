@@ -195,13 +195,17 @@ def results_view():
 
 def input_pill():
     return rx.box(
-            rx.hstack(
+        rx.hstack(
             rx.text_area(
                 value=State.input_text,
                 on_change=State.set_input,
                 placeholder="Escribe tu mensaje aquí...",
                 on_key_down=State.handle_keyboard,
-                class_name="w-full bg-transparent border-none focus:ring-0 text-inherit resize-none",
+                class_name=rx.cond(
+                    rx.color_mode == "light",
+                    "w-full bg-transparent border-none focus:ring-0 text-slate-900 placeholder-slate-400 resize-none",
+                    "w-full bg-transparent border-none focus:ring-0 text-white placeholder-slate-500 resize-none",
+                ),
                 style={"minHeight": "44px", "maxHeight": "140px"},
             ),
             rx.hstack(
@@ -228,15 +232,13 @@ def input_pill():
                 ),
                 spacing="2",
                 align="center",
-                class_name="pr-2 pb-2 md:pb-0",
             ),
-            align="end",
+            align="center",
             class_name=rx.cond(
                 rx.color_mode == "light",
-                "border border-slate-200 rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.04)] transition-all duration-200 w-full bg-white/92",
-                "border border-slate-800/80 rounded-2xl shadow-[0_15px_50px_rgba(0,0,0,0.4)] transition-all duration-200 w-full bg-[#0f172a]/60",
+                "bg-white border border-slate-200 rounded-xl shadow-sm flex items-center p-2 w-full max-w-3xl",
+                "bg-[#1e293b] border border-slate-700 rounded-xl shadow-md flex items-center p-2 w-full max-w-3xl",
             ),
-            style={"backdrop-filter": "blur(20px)"},
         ),
         class_name="fixed bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-24px)] max-w-3xl z-50 px-2",
     )
