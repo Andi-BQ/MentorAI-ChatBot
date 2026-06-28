@@ -29,9 +29,27 @@ def render_chat_message(msg):
                     "bg-gradient-to-r from-blue-600 to-cyan-500 p-3 rounded-2xl max-w-[70%] shadow-sm",
                 ),
             ),
+            rx.center(
+                rx.text("\U0001f464", class_name="text-base"),
+                class_name=rx.cond(
+                    rx.color_mode == "light",
+                    "w-9 h-9 rounded-full bg-indigo-200/50 border border-indigo-300/40 flex-shrink-0 shadow-sm",
+                    "w-9 h-9 rounded-full bg-slate-700/60 border border-slate-600/40 flex-shrink-0 shadow-sm",
+                ),
+            ),
+            spacing="2",
+            align="end",
             class_name="w-full justify-end px-4 py-2",
         ),
         rx.hstack(
+            rx.center(
+                rx.text("\U0001f9e0", class_name="text-base"),
+                class_name=rx.cond(
+                    rx.color_mode == "light",
+                    "w-9 h-9 rounded-full bg-indigo-100/60 border border-indigo-200/40 flex-shrink-0 shadow-sm",
+                    "w-9 h-9 rounded-full bg-slate-700/80 border border-slate-600/40 flex-shrink-0 shadow-sm",
+                ),
+            ),
             rx.box(
                 rx.text(
                     msg["content"],
@@ -46,6 +64,8 @@ def render_chat_message(msg):
                     "bg-[#1e293b] border border-slate-700 p-4 rounded-2xl max-w-[85%] shadow-md",
                 ),
             ),
+            spacing="2",
+            align="end",
             class_name="w-full justify-start px-4 py-2",
         ),
     )

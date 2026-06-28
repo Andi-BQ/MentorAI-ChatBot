@@ -213,8 +213,7 @@ class State(rx.State):
 
     def handle_keyboard(self, e: str):
         if e == "Enter":
-            self.show_suggestions = self.show_suggestions
-            return State.send_from_input
+            return [rx.prevent_default, State.send_from_input]
 
     def send_from_input(self):
         text = self.input_text.strip()
