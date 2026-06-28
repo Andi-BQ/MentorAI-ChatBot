@@ -1,6 +1,11 @@
 import reflex as rx
 from .state import State
 
+# Tailwind classes usadas dinámicamente (fuerza compilación JIT):
+# text-slate-900 text-white placeholder-slate-400 placeholder-slate-500
+# bg-white bg-[#1e293b] text-slate-800 text-slate-100
+# bg-indigo-100 border-indigo-200 bg-gradient-to-r from-blue-600 to-cyan-500
+
 # ----------------------------------------------------------------------
 # 1. BURBUJAS DE CHAT ADAPTATIVAS (rx.cond para tema, sin dark:)
 # ----------------------------------------------------------------------
@@ -205,18 +210,24 @@ def results_view():
 def input_pill():
     return rx.box(
         rx.hstack(
-            rx.text_area(
-                value=State.input_text,
-                on_change=State.set_input,
-                placeholder="Escribe tu mensaje aquí...",
-                on_key_down=State.handle_keyboard,
-                class_name="w-full bg-transparent border-none focus:ring-0 placeholder-slate-400 resize-none",
-                style={
-                    "color": rx.cond(rx.color_mode == "light", "#0f172a", "#f8fafc"),
-                    "minHeight": "44px",
-                    "maxHeight": "140px",
-                    "width": "100%",
-                },
+            rx.cond(
+                rx.color_mode == "light",
+                rx.text_area(
+                    value=State.input_text,
+                    on_change=State.set_input,
+                    placeholder="Escribe tu mensaje aquí...",
+                    on_key_down=State.handle_keyboard,
+                    class_name="w-full bg-transparent border-none focus:ring-0 text-slate-900 placeholder-slate-400 resize-none",
+                    style={"minHeight": "44px", "maxHeight": "140px", "width": "100%"},
+                ),
+                rx.text_area(
+                    value=State.input_text,
+                    on_change=State.set_input,
+                    placeholder="Escribe tu mensaje aquí...",
+                    on_key_down=State.handle_keyboard,
+                    class_name="w-full bg-transparent border-none focus:ring-0 text-white placeholder-slate-500 resize-none",
+                    style={"minHeight": "44px", "maxHeight": "140px", "width": "100%"},
+                ),
             ),
             rx.hstack(
                 rx.button(
