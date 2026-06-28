@@ -11,7 +11,11 @@ def render_chat_message(msg):
         msg["role"] == "user",
         rx.hstack(
             rx.box(
-                rx.text(msg["content"], class_name="text-white font-medium break-words"),
+                rx.text(
+                    msg["content"],
+                    class_name="font-medium break-words",
+                    style={"color": "#ffffff"},
+                ),
                 class_name="bg-gradient-to-r from-blue-600 to-cyan-500 p-3 rounded-2xl max-w-[70%] shadow-sm",
             ),
             class_name="w-full justify-end px-4 py-2",
@@ -20,11 +24,10 @@ def render_chat_message(msg):
             rx.box(
                 rx.text(
                     msg["content"],
-                    class_name=rx.cond(
-                        rx.color_mode == "light",
-                        "text-slate-800 font-normal break-words",
-                        "text-slate-100 font-normal break-words",
-                    ),
+                    class_name="font-normal break-words",
+                    style={
+                        "color": rx.cond(rx.color_mode == "light", "#1e293b", "#f1f5f9"),
+                    },
                 ),
                 class_name=rx.cond(
                     rx.color_mode == "light",
