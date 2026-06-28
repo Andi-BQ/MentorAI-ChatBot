@@ -192,11 +192,17 @@ class State(rx.State):
         self.radar_html = ""
         self.bar_html = ""
 
-    def toggle_settings(self):
-        self.show_settings = not self.show_settings
+    def toggle_settings(self, is_open=None):
+        if is_open is not None:
+            self.show_settings = is_open
+        else:
+            self.show_settings = not self.show_settings
 
-    def toggle_profile(self):
-        self.show_profile = not self.show_profile
+    def toggle_profile(self, is_open=None):
+        if is_open is not None:
+            self.show_profile = is_open
+        else:
+            self.show_profile = not self.show_profile
 
     def set_temperature(self, value: str):
         self.temperature = value

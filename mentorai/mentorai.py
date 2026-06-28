@@ -248,93 +248,97 @@ def input_pill():
 
 
 def settings_popup():
-    return rx.box(
-        rx.button(
-            rx.text("\u2699\ufe0f", class_name="text-base"),
-            on_click=State.toggle_settings,
-            variant=rx.cond(State.show_settings, "surface", "ghost"),
-            color_scheme="indigo",
-            class_name="w-10 h-10 rounded-full cursor-pointer flex items-center justify-center border-none",
-        ),
-        rx.cond(
-            State.show_settings,
-            rx.box(
-                rx.vstack(
-                    rx.text("Preferencias", class_name="font-bold text-sm"),
-                    rx.text(
-                        "Temperatura del modelo",
-                        class_name="text-[11px] font-semibold text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-wider",
-                    ),
-                    rx.select(
-                        ["0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1.0"],
-                        default_value="0.7",
-                        on_change=State.set_temperature,
-                        variant="surface",
-                        class_name="w-full mt-1 text-xs",
-                    ),
-                    rx.text(
-                        "Arquitectura Llama-3.3 Cloud",
-                        class_name="text-[10px] text-slate-400 dark:text-slate-500 font-medium text-right w-full mt-1.5",
-                    ),
-                    class_name="p-4 gap-1",
-                ),
-                class_name=rx.cond(
-                    rx.color_mode == "light",
-                    "absolute top-12 right-0 border border-slate-200 rounded-2xl shadow-xl z-50 min-w-[220px] animate-fade-in bg-white",
-                    "absolute top-12 right-0 border border-slate-800 rounded-2xl shadow-xl z-50 min-w-[220px] animate-fade-in bg-[#111827]",
-                ),
+    return rx.popover.root(
+        rx.popover.trigger(
+            rx.button(
+                rx.text("\u2699\ufe0f", class_name="text-base"),
+                variant=rx.cond(State.show_settings, "surface", "ghost"),
+                color_scheme="indigo",
+                class_name="w-10 h-10 rounded-full cursor-pointer flex items-center justify-center border-none",
             ),
         ),
-        class_name="relative",
+        rx.popover.content(
+            rx.vstack(
+                rx.text("Preferencias", class_name="font-bold text-sm"),
+                rx.text(
+                    "Temperatura del modelo",
+                    class_name="text-[11px] font-semibold text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-wider",
+                ),
+                rx.select(
+                    ["0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1.0"],
+                    default_value="0.7",
+                    on_change=State.set_temperature,
+                    variant="surface",
+                    class_name="w-full mt-1 text-xs",
+                ),
+                rx.text(
+                    "Arquitectura Llama-3.3 Cloud",
+                    class_name="text-[10px] text-slate-400 dark:text-slate-500 font-medium text-right w-full mt-1.5",
+                ),
+                class_name="p-4 gap-1 w-64",
+            ),
+            side="bottom",
+            align="end",
+            side_offset=8,
+            class_name=rx.cond(
+                rx.color_mode == "light",
+                "bg-white border border-slate-200 rounded-2xl shadow-xl z-50",
+                "bg-[#131c2e] border border-slate-800 rounded-2xl shadow-xl z-50",
+            ),
+        ),
+        open=State.show_settings,
+        on_open_change=State.toggle_settings,
     )
 
 
 def profile_popup():
-    return rx.box(
-        rx.button(
-            rx.text("\U0001f464", class_name="text-base"),
-            on_click=State.toggle_profile,
-            variant=rx.cond(State.show_profile, "surface", "ghost"),
-            color_scheme="indigo",
-            class_name="w-10 h-10 rounded-full cursor-pointer flex items-center justify-center border-none",
-        ),
-        rx.cond(
-            State.show_profile,
-            rx.box(
-                rx.vstack(
-                    rx.text("Perfil del Estudiante", class_name="font-bold text-sm"),
-                    rx.box(
-                        rx.text(
-                            "Estado actual:",
-                            class_name="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider",
-                        ),
-                        rx.text(
-                            "Evaluaci\u00f3n Vocacional Activa",
-                            class_name="text-xs font-bold mt-0.5",
-                        ),
-                        class_name=rx.cond(
-                            rx.color_mode == "light",
-                            "bg-indigo-50/60 rounded-xl p-3 w-full mt-2 border border-indigo-100/30 text-indigo-600",
-                            "bg-slate-800/40 rounded-xl p-3 w-full mt-2 border border-slate-700/30 text-cyan-400",
-                        ),
-                    ),
-                    rx.button(
-                        "Limpiar historial y reiniciar",
-                        on_click=State.reset_chat,
-                        variant="soft",
-                        color_scheme="red",
-                        class_name="text-xs cursor-pointer w-full mt-3 font-semibold py-2 rounded-xl",
-                    ),
-                    class_name="p-4 gap-1",
-                ),
-                class_name=rx.cond(
-                    rx.color_mode == "light",
-                    "absolute top-12 right-0 border border-slate-200 rounded-2xl shadow-xl z-50 min-w-[240px] animate-fade-in bg-white",
-                    "absolute top-12 right-0 border border-slate-800 rounded-2xl shadow-xl z-50 min-w-[240px] animate-fade-in bg-[#111827]",
-                ),
+    return rx.popover.root(
+        rx.popover.trigger(
+            rx.button(
+                rx.text("\U0001f464", class_name="text-base"),
+                variant=rx.cond(State.show_profile, "surface", "ghost"),
+                color_scheme="indigo",
+                class_name="w-10 h-10 rounded-full cursor-pointer flex items-center justify-center border-none",
             ),
         ),
-        class_name="relative",
+        rx.popover.content(
+            rx.vstack(
+                rx.text("Perfil del Estudiante", class_name="font-bold text-sm"),
+                rx.box(
+                    rx.text(
+                        "Estado actual:",
+                        class_name="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider",
+                    ),
+                    rx.text(
+                        "Evaluaci\u00f3n Vocacional Activa",
+                        class_name="text-xs font-bold mt-0.5",
+                    ),
+                    class_name=rx.cond(
+                        rx.color_mode == "light",
+                        "bg-indigo-50/60 rounded-xl p-3 w-full mt-2 border border-indigo-100/30 text-indigo-600",
+                        "bg-slate-800/40 rounded-xl p-3 w-full mt-2 border border-slate-700/30 text-cyan-400",
+                    ),
+                ),
+                rx.button(
+                    "Limpiar historial y reiniciar",
+                    on_click=State.reset_chat,
+                    variant="soft",
+                    color_scheme="red",
+                    class_name="text-xs cursor-pointer w-full mt-3 font-semibold py-2 rounded-xl",
+                ),
+                class_name="p-4 gap-1 w-64",
+            ),
+            side="bottom",
+            align="end",
+            side_offset=8,
+            class_name=rx.cond(
+                rx.color_mode == "light",
+                "bg-white border border-slate-200 rounded-2xl shadow-xl z-50",
+                "bg-[#131c2e] border border-slate-800 rounded-2xl shadow-xl z-50",
+            ),
+        ),
+        open=State.show_profile,
+        on_open_change=State.toggle_profile,
     )
 
 
@@ -371,8 +375,7 @@ def index():
                         ),
                         settings_popup(),
                         profile_popup(),
-                        spacing="2",
-                        align="center",
+                        class_name="flex items-center gap-4",
                     ),
                     class_name="flex items-center justify-between w-full max-w-4xl mx-auto h-full px-4 md:px-6",
                 ),
