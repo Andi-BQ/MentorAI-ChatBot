@@ -252,24 +252,16 @@ def input_pill():
             rx.cond(
                 State.is_recording,
                 recording_indicator(),
-                rx.cond(
-                    rx.color_mode == "light",
-                    rx.text_area(
-                        value=State.input_text,
-                        on_change=State.set_input,
-                        placeholder="Escribe tu mensaje aquí...",
-                        on_key_down=State.handle_keyboard,
-                        class_name="w-full bg-transparent border-none focus:ring-0 text-slate-900 placeholder-slate-400 resize-none",
-                        style={"minHeight": "44px", "maxHeight": "140px", "width": "100%"},
-                    ),
-                    rx.text_area(
-                        value=State.input_text,
-                        on_change=State.set_input,
-                        placeholder="Escribe tu mensaje aquí...",
-                        on_key_down=State.handle_keyboard,
-                        class_name="w-full bg-transparent border-none focus:ring-0 text-white placeholder-slate-500 resize-none",
-                        style={"minHeight": "44px", "maxHeight": "140px", "width": "100%"},
-                    ),
+                rx.text_area(
+                    value=State.input_text,
+                    on_change=State.set_input,
+                    placeholder="Escribe tu mensaje aquí...",
+                    on_key_down=State.handle_keyboard,
+                    class_name="w-full bg-transparent border-none focus:ring-0 resize-none",
+                    style={
+                        "minHeight": "44px", "maxHeight": "140px", "width": "100%",
+                        "color": rx.cond(rx.color_mode == "light", "#0f172a", "#f8fafc"),
+                    },
                 ),
             ),
             rx.hstack(
@@ -433,35 +425,6 @@ def profile_popup():
 # ----------------------------------------------------------------------
 
 
-def mock_engine_warning():
-    return rx.cond(
-        ~State.engine_ready,
-        rx.box(
-            rx.hstack(
-                rx.text("\u26a0\ufe0f", class_name="text-lg"),
-                rx.vstack(
-                    rx.text(
-                        "Motor de recomendaci\u00f3n no disponible",
-                        class_name="font-bold text-xs",
-                    ),
-                    rx.text(
-                        "Las recomendaciones mostradas son simuladas. Contacta al administrador.",
-                        class_name="text-[11px] opacity-80",
-                    ),
-                    spacing="0",
-                ),
-                spacing="2",
-                align="center",
-                class_name="px-3 py-2",
-            ),
-            class_name=rx.cond(
-                rx.color_mode == "light",
-                "w-full max-w-3xl mx-auto mt-2 mb-1 bg-amber-50 border border-amber-200 rounded-xl",
-                "w-full max-w-3xl mx-auto mt-2 mb-1 bg-amber-900/20 border border-amber-700/40 rounded-xl",
-            ),
-        ),
-    )
-
 
 # ----------------------------------------------------------------------
 # 7. MAQUETACIÓN PRINCIPAL (INDEX)
@@ -511,7 +474,6 @@ def index():
                 },
             ),
             rx.box(
-                mock_engine_warning(),
                 rx.foreach(
                     State.messages,
                     lambda msg: rx.cond(
