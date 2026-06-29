@@ -2,8 +2,6 @@ import reflex as rx
 
 config = rx.Config(
     app_name="mentorai",
-    backend_port=8080,
-    frontend_port=3000,
     host="0.0.0.0",
     plugins=[
         rx.plugins.TailwindV3Plugin(),
