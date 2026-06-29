@@ -355,8 +355,9 @@ class State(rx.State):
                 )
 
                 values = [datos_llm.get(k, 5) for k in skill_keys]
-                self.radar_json = build_radar_chart(values, self.color_mode)
-                self.bar_json = build_bar_chart(recomendaciones, self.color_mode)
+                color_mode = getattr(self, 'color_mode', 'light')
+                self.radar_json = build_radar_chart(values, color_mode)
+                self.bar_json = build_bar_chart(recomendaciones, color_mode)
                 yield State.plot_charts
                 return
             else:
