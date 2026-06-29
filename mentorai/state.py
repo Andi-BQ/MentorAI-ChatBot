@@ -1,58 +1,59 @@
-import os
-import json
-import re
 import base64
+import json
+import os
 import random
-from typing import Dict, List, Any, Optional
+import re
+from typing import Any, Dict, List, Optional
 
-import reflex as rx
 import joblib
+import plotly.graph_objects as go
+import reflex as rx
 from dotenv import load_dotenv
 from openai import OpenAI
-import plotly.graph_objects as go
-import numpy as np
 
 load_dotenv()
 
 API_KEY = os.getenv("GROQ_API_KEY", "")
 if not API_KEY:
-    print("ℹ️  GROQ_API_KEY no encontrada. Configúrala como variable de entorno en Reflex Cloud o crea un archivo .env.")
+    print("ℹ️  GROQ_API_KEY no encontrada.")
 
 client = None
 if API_KEY:
     client = OpenAI(api_key=API_KEY, base_url="https://api.groq.com/openai/v1")
 
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+class MockEngine:
+    def recommend(self, perfil, top_k=5, include_details=True):
+        carreras = [
+            "Datos e IA", "Tecnología Core", "Diseño UX/UI",
+            "Negocios Tech", "Marketing Digital",
+        ]
+        random.shuffle(carreras)
+        return [
+            {
+                "rank": i + 1,
+                "carrera": c,
+                "confidence": round(random.uniform(70, 95) - (i * 3), 1),
+            }
+            for i, c in enumerate(carreras[:top_k])
+        ]
+
+
 def load_mentor_engine():
     model_path = os.path.join("modelos", "motor_completo.joblib")
     if os.path.exists(model_path):
         try:
-            # Registrar CareerEngineES en __main__ para que joblib lo encuentre
             import sys
+            if BASE_DIR not in sys.path:
+                sys.path.insert(0, BASE_DIR)
             from src.recomendacion.motor_recomendacion import CareerEngineES
             sys.modules["__main__"].CareerEngineES = CareerEngineES
             return joblib.load(model_path)
         except Exception as e:
             print(f"Error cargando modelo {model_path}: {e}")
-
-    class MockEngine:
-        def recommend(self, perfil, top_k=5, include_details=True):
-            carreras = [
-                "Datos e IA",
-                "Tecnología Core",
-                "Diseño UX/UI",
-                "Negocios Tech",
-                "Marketing Digital",
-            ]
-            random.shuffle(carreras)
-            return [
-                {
-                    "rank": i + 1,
-                    "carrera": c,
-                    "confidence": round(random.uniform(70, 95) - (i * 3), 1),
-                }
-                for i, c in enumerate(carreras[:top_k])
-            ]
 
     return MockEngine()
 
@@ -84,14 +85,18 @@ def translate_career(key: str) -> str:
     return TRANSLATIONS.get(key, key.replace("_", " ").title())
 
 
-SYSTEM_PROMPT = """
-Eres MentorAI, un orientador vocacional empático y conversacional.
-Evalúa al usuario en 13 áreas (del 1 al 10), además de conocer su 'age' y 'education' (1=Secundaria, 2=Universidad, 3=Maestría, 4=Doctorado).
-Áreas: analytical, logical_reasoning, problem_solving, creativity, design, communication, empathy, social, teamwork, leadership, technology, business, stress_tolerance.
+SYSTEM_PROMPT = """Eres MentorAI, un orientador vocacional empático y conversacional.
+Evalúa al usuario en 13 áreas (del 1 al 10), además de conocer su 'age' y
+'education' (1=Secundaria, 2=Universidad, 3=Maestría, 4=Doctorado).
+Áreas: analytical, logical_reasoning, problem_solving, creativity, design,
+communication, empathy, social, teamwork, leadership, technology, business,
+stress_tolerance.
 
 REGLAS:
-1. Haz preguntas fluidas e investiga sus pasiones. Máximo 2 preguntas por mensaje.
-2. Cuando tengas datos suficientes para los 15 valores, corta la conversación y responde ÚNICAMENTE con el bloque JSON solicitado.
+1. Haz preguntas fluidas e investiga tus pasiones. Máximo 2 preguntas por
+   mensaje.
+2. Cuando tengas datos suficientes para los 15 valores, corta la conversación
+   y responde ÚNICAMENTE con el bloque JSON solicitado.
 """
 
 
@@ -124,13 +129,16 @@ def extract_json(text: str) -> Optional[Dict[str, Any]]:
     return None
 
 
-def build_radar_chart(values: List[int]) -> str:
+def build_radar_chart(values: List[int], color_mode: str = "light") -> str:
+    if not values:
+        return go.Figure().to_json()
     labels = [
         "Analítico", "Razonamiento Lógico", "Resolución Problemas",
         "Creatividad", "Diseño", "Comunicación", "Empatía",
         "Social", "Trabajo Equipo", "Liderazgo", "Tecnología",
         "Negocios", "Tol. Estrés",
     ]
+    is_dark = color_mode == "dark"
     fig = go.Figure()
     fig.add_trace(go.Scatterpolar(
         r=values + [values[0]],
@@ -139,25 +147,29 @@ def build_radar_chart(values: List[int]) -> str:
         fillcolor="rgba(37, 99, 235, 0.2)",
         line=dict(color="#2563EB", width=2.5),
     ))
+    grid_color = "#334155" if is_dark else "#E2E8F0"
+    tick_color = "#94A3B8" if is_dark else "#94A3B8"
+    label_color = "#CBD5E1" if is_dark else "#475569"
     fig.update_layout(
         polar=dict(
             radialaxis=dict(
                 visible=True, range=[0, 10],
-                tickfont=dict(size=9, color="#94A3B8"),
-                gridcolor="#E2E8F0",
+                tickfont=dict(size=9, color=tick_color),
+                gridcolor=grid_color,
             ),
-            angularaxis=dict(tickfont=dict(size=9, color="#475569")),
+            angularaxis=dict(tickfont=dict(size=9, color=label_color)),
             bgcolor="rgba(0,0,0,0)",
         ),
         paper_bgcolor="rgba(0,0,0,0)",
         showlegend=False,
         height=320,
         margin=dict(l=40, r=40, t=10, b=10),
+        font=dict(color="#F1F5F9" if is_dark else "#0F172A"),
     )
-    return fig.to_html(include_plotlyjs="cdn", full_html=False)
+    return fig.to_json()
 
 
-def build_bar_chart(recommendations: List[dict]) -> str:
+def build_bar_chart(recommendations: List[dict], color_mode: str = "light") -> str:
     labels = [r["carrera"] for r in recommendations]
     values = [r["confidence"] for r in recommendations]
     fig = go.Figure(go.Bar(
@@ -171,10 +183,11 @@ def build_bar_chart(recommendations: List[dict]) -> str:
         text=[f"{c}%" for c in values],
         textposition="outside",
     ))
+    is_dark = color_mode == "dark"
     fig.update_layout(
         yaxis=dict(
             autorange="reversed",
-            tickfont=dict(size=12, color="#1E293B"),
+            tickfont=dict(size=12, color="#CBD5E1" if is_dark else "#1E293B"),
         ),
         xaxis=dict(range=[0, 100], visible=False),
         height=240,
@@ -182,8 +195,9 @@ def build_bar_chart(recommendations: List[dict]) -> str:
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         showlegend=False,
+        font=dict(color="#F1F5F9" if is_dark else "#0F172A"),
     )
-    return fig.to_html(include_plotlyjs="cdn", full_html=False)
+    return fig.to_json()
 
 
 class State(rx.State):
@@ -201,15 +215,19 @@ class State(rx.State):
 
     top_career: str = ""
     recommendations: List[Dict[str, Any]] = []
-    radar_html: str = ""
-    bar_html: str = ""
+    radar_json: str = ""
+    bar_json: str = ""
+
+    @rx.var
+    def engine_ready(self) -> bool:
+        return not isinstance(engine, MockEngine)
 
     def init_chat(self):
         self.messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
             {
                 "role": "assistant",
-                "content": "¡Hola! Soy MentorAI 🧠. Cuéntame un poco sobre ti: ¿qué actividades o materias disfrutas más en tu día a día?",
+                "content": "¡Hola! Soy MentorAI 🧠. Cuéntame sobre ti: ¿qué actividades o materias disfrutas más?",
             },
         ]
         self.finished = False
@@ -222,8 +240,8 @@ class State(rx.State):
         self.show_profile = False
         self.top_career = ""
         self.recommendations = []
-        self.radar_html = ""
-        self.bar_html = ""
+        self.radar_json = ""
+        self.bar_json = ""
 
     def toggle_settings(self, is_open=None):
         if is_open is not None:
@@ -273,21 +291,11 @@ class State(rx.State):
         self.loading = True
         return State.process_chat
 
-    def send_message(self, text: str):
-        if not text.strip() or self.finished:
-            return
-        self.input_text = ""
-        self._input_synced = True
-        self.messages.append({"role": "user", "content": text.strip()})
-        self.show_suggestions = False
-        self.loading = True
-        return State.process_chat
-
     async def process_chat(self):
         if not client:
             self.messages.append({
                 "role": "assistant",
-                "content": "⚠️ GROQ_API_KEY no configurada. Agrégala como variable de entorno en Reflex Cloud (Settings → Secrets) o crea un archivo .env en la raíz del proyecto.",
+                "content": "⚠️ GROQ_API_KEY no configurada. Configúrala en Reflex Cloud (secrets) o en .env.",
             })
             self.loading = False
             return
@@ -347,8 +355,10 @@ class State(rx.State):
                 )
 
                 values = [datos_llm.get(k, 5) for k in skill_keys]
-                self.radar_html = build_radar_chart(values)
-                self.bar_html = build_bar_chart(recomendaciones)
+                self.radar_json = build_radar_chart(values, self.color_mode)
+                self.bar_json = build_bar_chart(recomendaciones, self.color_mode)
+                yield State.plot_charts
+                return
             else:
                 self.messages.append({
                     "role": "assistant",
@@ -361,6 +371,16 @@ class State(rx.State):
                 "content": f"⚠️ Error de conexión con la IA: {str(e)}",
             })
             self.loading = False
+
+    def plot_charts(self):
+        return rx.call_script(
+            f"""setTimeout(function() {{
+    var r = window.Plotly && document.getElementById('radar-chart');
+    var b = window.Plotly && document.getElementById('bar-chart');
+    if (r) Plotly.newPlot(r, {self.radar_json}, {{}}, {{responsive:true,displayModeBar:false}});
+    if (b) Plotly.newPlot(b, {self.bar_json}, {{}}, {{responsive:true,displayModeBar:false}});
+}}, 50);"""
+        )
 
     def reset_chat(self):
         self.init_chat()

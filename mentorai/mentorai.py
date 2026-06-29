@@ -1,4 +1,5 @@
 import reflex as rx
+
 from .state import State
 
 # Tailwind classes usadas dinámicamente (fuerza compilación JIT):
@@ -6,6 +7,7 @@ from .state import State
 # bg-white bg-[#1e293b] text-slate-800 text-slate-100
 # bg-indigo-100 border-indigo-200 bg-gradient-to-r from-blue-600 to-cyan-500
 # bg-red-500 bg-red-600 overflow-y-auto z-[10000]
+# bg-amber-50 border-amber-200 bg-amber-900/20 border-amber-700/40
 # animate-pulse [animation-delay:0.1s] [animation-delay:0.2s]
 # [animation-delay:0.3s] [animation-delay:0.4s]
 
@@ -14,7 +16,7 @@ from .state import State
 # ----------------------------------------------------------------------
 
 
-def render_chat_message(msg):
+def render_chat_message(msg: dict):
     return rx.cond(
         msg["role"] == "user",
         rx.hstack(
@@ -67,7 +69,7 @@ def render_chat_message(msg):
 # ----------------------------------------------------------------------
 
 
-def suggestion_card(text, label, icon):
+def suggestion_card(text: str, label: str, icon: str):
     return rx.box(
         rx.hstack(
             rx.center(
@@ -199,10 +201,10 @@ def results_view():
             class_name="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-cyan-500 dark:from-indigo-400 dark:to-cyan-400 text-center mb-6 px-4 drop-shadow-sm",
         ),
         rx.cond(
-            State.radar_html != "",
+            State.radar_json != "",
             rx.box(
                 rx.box(
-                    rx.html(State.radar_html),
+                    rx.html('<div id="radar-chart" style="height:320px;width:100%;"></div>'),
                     class_name=rx.cond(
                         rx.color_mode == "light",
                         "w-full md:w-1/2 p-2 bg-white border border-slate-100 rounded-2xl shadow-sm",
@@ -210,7 +212,7 @@ def results_view():
                     ),
                 ),
                 rx.box(
-                    rx.html(State.bar_html),
+                    rx.html('<div id="bar-chart" style="height:240px;width:100%;"></div>'),
                     class_name=rx.cond(
                         rx.color_mode == "light",
                         "w-full md:w-1/2 p-2 bg-white border border-slate-100 rounded-2xl shadow-sm",
@@ -427,6 +429,41 @@ def profile_popup():
 
 
 # ----------------------------------------------------------------------
+# 6b. BANNER DE ADVERTENCIA (MockEngine activo)
+# ----------------------------------------------------------------------
+
+
+def mock_engine_warning():
+    return rx.cond(
+        ~State.engine_ready,
+        rx.box(
+            rx.hstack(
+                rx.text("\u26a0\ufe0f", class_name="text-lg"),
+                rx.vstack(
+                    rx.text(
+                        "Motor de recomendaci\u00f3n no disponible",
+                        class_name="font-bold text-xs",
+                    ),
+                    rx.text(
+                        "Las recomendaciones mostradas son simuladas. Contacta al administrador.",
+                        class_name="text-[11px] opacity-80",
+                    ),
+                    spacing="0",
+                ),
+                spacing="2",
+                align="center",
+                class_name="px-3 py-2",
+            ),
+            class_name=rx.cond(
+                rx.color_mode == "light",
+                "w-full max-w-3xl mx-auto mt-2 mb-1 bg-amber-50 border border-amber-200 rounded-xl",
+                "w-full max-w-3xl mx-auto mt-2 mb-1 bg-amber-900/20 border border-amber-700/40 rounded-xl",
+            ),
+        ),
+    )
+
+
+# ----------------------------------------------------------------------
 # 7. MAQUETACIÓN PRINCIPAL (INDEX)
 # ----------------------------------------------------------------------
 
@@ -474,6 +511,7 @@ def index():
                 },
             ),
             rx.box(
+                mock_engine_warning(),
                 rx.foreach(
                     State.messages,
                     lambda msg: rx.cond(
@@ -516,6 +554,7 @@ app = rx.App(
     head_components=[
         rx.el.link(rel="stylesheet", href="/style.css"),
         rx.el.script(src="/mic.js"),
+        rx.el.script(src="https://cdn.plot.ly/plotly-latest.min.js"),
     ],
 )
 app.add_page(index, route="/", title="MentorAI \U0001f9e0 | Orientaci\u00f3n Profesional Vocacional", on_load=State.init_chat)

@@ -1,34 +1,16 @@
-import numpy as np
-from sklearn.base import BaseEstimator, RegressorMixin
-
-
-class CalibracionConfianza(BaseEstimator, RegressorMixin):
-    def __init__(self, base_model=None):
-        self.base_model = base_model
-
-    def fit(self, X, y):
-        return self
-
-    def predict(self, X):
-        if self.base_model is not None:
-            return self.base_model.predict_proba(X)
-        return np.full((X.shape[0],), 0.85)
-
-
-# ==========================================
-# ALIAS PARA DESERIALIZACIÓN DE JOBLIB
-# ==========================================
-# Definimos todas las clases antiguas para que apunten a tu lógica actual
-# (asumiendo que tu clase real se llama CalibracionConfianza)
-
 class CalibratedWrapper:
     def __init__(self, *args, **kwargs):
-        self._model = None
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-    def __getattr__(self, name):
-        return lambda *a, **kw: None
+    def predict_proba(self, x):
+        model = getattr(self, 'model', None) or getattr(self, 'base_model', None)
+        if model is not None:
+            return model.predict_proba(x)
+        raise RuntimeError("CalibratedWrapper: no base model available")
+
+    def predict(self, x):
+        return self.predict_proba(x)
 
 
 class TemperatureScaler:
@@ -36,8 +18,11 @@ class TemperatureScaler:
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-    def __getattr__(self, name):
-        return lambda *a, **kw: None
+    def predict_proba(self, x):
+        model = getattr(self, 'model', None) or getattr(self, 'base_model', None)
+        if model is not None:
+            return model.predict_proba(x)
+        return x
 
-# Si tu clase actual se llama CalibracionConfianza, los enlazamos así:
-# (Si no, puedes dejarlos como clases vacías arriba para que joblib no explote)
+    def predict(self, x):
+        return self.predict_proba(x)
