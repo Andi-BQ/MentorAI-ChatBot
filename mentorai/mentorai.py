@@ -7,7 +7,6 @@ from .state import State
 # bg-white bg-[#1e293b] text-slate-800 text-slate-100
 # bg-indigo-100 border-indigo-200 bg-gradient-to-r from-blue-600 to-cyan-500
 # bg-red-500 bg-red-600 overflow-y-auto z-[10000]
-# bg-amber-50 border-amber-200 bg-amber-900/20 border-amber-700/40
 # animate-pulse [animation-delay:0.1s] [animation-delay:0.2s]
 # [animation-delay:0.3s] [animation-delay:0.4s]
 
@@ -421,12 +420,6 @@ def profile_popup():
 
 
 # ----------------------------------------------------------------------
-# 6b. BANNER DE ADVERTENCIA (MockEngine activo)
-# ----------------------------------------------------------------------
-
-
-
-# ----------------------------------------------------------------------
 # 7. MAQUETACIÓN PRINCIPAL (INDEX)
 # ----------------------------------------------------------------------
 
@@ -516,7 +509,7 @@ app = rx.App(
     head_components=[
         rx.el.link(rel="stylesheet", href="/style.css"),
         rx.el.script(src="/mic.js"),
-        rx.el.script(src="https://cdn.plot.ly/plotly-latest.min.js"),
+        rx.el.script(src="https://cdn.plot.ly/plotly-3.6.0.min.js"),
     ],
 )
 app.add_page(index, route="/", title="MentorAI \U0001f9e0 | Orientaci\u00f3n Profesional Vocacional", on_load=State.init_chat)

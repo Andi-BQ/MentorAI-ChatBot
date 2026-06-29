@@ -330,17 +330,17 @@ class State(rx.State):
                     "business", "stress_tolerance",
                 ]
                 perfil_usuario = {
-                    k: datos_llm.get(k, 5) / 10.0 for k in skill_keys
+                    k: (datos_llm.get(k) or 5) / 10.0 for k in skill_keys
                 }
                 perfil_usuario["education"] = edu_map.get(
-                    int(datos_llm.get("education", 2)), 0.5
+                    int(datos_llm.get("education") or 2), 0.5
                 )
                 perfil_usuario["age"] = min(
-                    datos_llm.get("age", 20) / 65.0, 1.0
+                    (datos_llm.get("age") or 20) / 65.0, 1.0
                 )
 
                 recomendaciones = engine.recommend(
-                    perfil_usuario, top_k=3, include_details=True
+                    perfil_usuario, top_k=3
                 )
                 recomendaciones = [
                     {k: (v.item() if hasattr(v, 'item') else v) for k, v in r.items()}
@@ -369,17 +369,19 @@ class State(rx.State):
         except Exception as e:
             self.messages.append({
                 "role": "assistant",
-                "content": f"⚠️ Error de conexión con la IA: {str(e)}",
+                "content": f"⚠️ Error al procesar la respuesta: {str(e)}",
             })
             self.loading = False
 
     def plot_charts(self):
+        radar_data = json.loads(self.radar_json) if self.radar_json else {"data": [], "layout": {}}
+        bar_data = json.loads(self.bar_json) if self.bar_json else {"data": [], "layout": {}}
         return rx.call_script(
             f"""setTimeout(function() {{
     var r = window.Plotly && document.getElementById('radar-chart');
     var b = window.Plotly && document.getElementById('bar-chart');
-    if (r) Plotly.newPlot(r, {self.radar_json}, {{}}, {{responsive:true,displayModeBar:false}});
-    if (b) Plotly.newPlot(b, {self.bar_json}, {{}}, {{responsive:true,displayModeBar:false}});
+    if (r) Plotly.newPlot(r, {json.dumps(radar_data)}, {{}}, {{responsive:true,displayModeBar:false}});
+    if (b) Plotly.newPlot(b, {json.dumps(bar_data)}, {{}}, {{responsive:true,displayModeBar:false}});
 }}, 50);"""
         )
 

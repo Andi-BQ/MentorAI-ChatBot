@@ -14,6 +14,8 @@ class CareerEngineES:
         ]
 
     def recommend(self, perfil, top_k=5, include_details=True):
+        if self.model is None or self.encoder is None:
+            raise RuntimeError("CareerEngineES: model or encoder not loaded")
         features = np.array([[perfil.get(k, 0.5) for k in self.feature_names]])
         if self.scaler:
             features = self.scaler.transform(features)
